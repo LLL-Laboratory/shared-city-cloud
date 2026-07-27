@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "artifactVersion": "0.2.0",
+  "artifactVersion": "0.3.0",
   "hostingProvider": "GITHUB PAGES ONLY",
   "deploymentStatus": "PUBLISHABLE STATIC ARTIFACT",
   "repository": "LLL-Laboratory/shared-city-cloud",
@@ -28,7 +28,8 @@
   "researchUtilities": {
     "evidenceConstellation": "9 TRACEABLE SOURCE NODES / LIMITATIONS VISIBLE",
     "openQuestions": "HOLD + UNKNOWN + PROPOSAL / NOT OUTCOMES",
-    "conflictView": "4 UNRESOLVED PATHWAYS / NO SETTLED CAUSE"
+    "conflictView": "4 UNRESOLVED PATHWAYS / NO SETTLED CAUSE",
+    "scenarioChamber": "3 EQUAL READ-ONLY LENS PATHWAYS / NO RUN OR CROSS-LENS SYNTHESIS"
   },
   "exclusions": [
     "NO EXTERNAL DATA COLLECTION",

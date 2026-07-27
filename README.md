@@ -26,6 +26,10 @@ Live preview:
   drainage pathway, BRT mobility factor, and intervention-versus-recession
   pathway. Every causal pathway remains `HOLD` or
   `UNKNOWN / NOT ESTIMABLE`.
+- **Scenario Chamber** presents three equal, separate, read-only lens corridors
+  for the existing condition. Each exposes its question, evidence limits,
+  hypotheses, current unknown, and next evidence need. No scenario runs, no
+  request starts, and no result transfers between lenses.
 - Spatial position, motion, routes, City Pulse, and Path Replay are interface
   demonstrations, not analytics or empirical conclusions.
 - Spatial proximity is navigation, never evidence.
@@ -48,7 +52,7 @@ hosted research storage.
 - Use **Whole world** to return.
 - Use **Navigator** for the same information without 3D navigation.
 - Keyboard shortcuts: `E` Evidence Constellation, `Q` Open Questions, `C`
-  Conflict View, `T` timeline, `H` guided handover, `N` Navigator, and
+  Conflict View, `S` Scenario Chamber, `T` timeline, `H` guided handover, `N` Navigator, and
   `Escape` to close the active layer.
 
 Deployment details and verification boundaries are recorded in

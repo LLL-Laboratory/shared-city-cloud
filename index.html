@@ -129,6 +129,40 @@
         <div id="detailActions" class="detail-actions"></div>
       </aside>
 
+      <dialog
+        id="scenarioChamber"
+        class="scenario-chamber"
+        aria-labelledby="scenarioChamberTitle"
+        aria-describedby="scenarioChamberCaveat"
+      >
+        <header class="scenario-chamber__head">
+          <div>
+            <p class="kicker">Read-only Scenario Chamber</p>
+            <h2 id="scenarioChamberTitle">SLC-0001 / three separate questions</h2>
+          </div>
+          <button
+            id="scenarioChamberClose"
+            class="icon-button"
+            type="button"
+            aria-label="Close Scenario Chamber"
+          >×</button>
+        </header>
+        <section class="scenario-chamber__condition" aria-labelledby="scenarioConditionTitle">
+          <div>
+            <p class="kicker">Shared condition / orientation only</p>
+            <h3 id="scenarioConditionTitle"></h3>
+          </div>
+          <dl id="scenarioConditionFacts"></dl>
+        </section>
+        <p id="scenarioChamberCaveat" class="scenario-chamber__caveat"></p>
+        <p id="scenarioChamberRule" class="scenario-chamber__rule"></p>
+        <div id="scenarioPathways" class="scenario-pathways"></div>
+        <footer class="scenario-chamber__foot">
+          <span>NO RUN / NO PREDICTION / NO RECORD CHANGE</span>
+          <button id="scenarioChamberReturn" type="button">Return to the selected condition</button>
+        </footer>
+      </dialog>
+
       <section id="pathReplay" class="route-layer" hidden aria-labelledby="pathTitle">
         <div class="route-layer__head">
           <div>
@@ -170,7 +204,7 @@
           <div>
             <p class="kicker">Non-3D route</p>
             <h2 id="navigatorTitle">The same research world, without 3D</h2>
-            <p>Every object opens the same labels, status, sources, limits, and explicit relationships. Evidence Constellation and Open Questions are complete scene groups; Conflict View is keyboard-accessible from its unresolved pathway objects.</p>
+            <p>Every object opens the same labels, status, sources, limits, and explicit relationships. Evidence Constellation and Open Questions are complete scene groups; Conflict View and the read-only Scenario Chamber use the same focused surfaces and data in 3D and non-3D routes.</p>
           </div>
           <button class="icon-button" type="button" data-close="navigator" aria-label="Close navigator">×</button>
         </div>

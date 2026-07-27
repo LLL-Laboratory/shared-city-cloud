@@ -15,6 +15,7 @@
   const guideLayer = document.querySelector("#guidedHandover");
   const navigator = document.querySelector("#navigator");
   const conflictComparison = document.querySelector("#conflictComparison");
+  const scenarioChamberDialog = document.querySelector("#scenarioChamber");
   const pulseMessage = document.querySelector("#cityPulseMessage");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -35,6 +36,8 @@
     focusNodes: new Set(),
     evidenceVisible: false,
     conflictPathwayId: null,
+    scenarioPathwayId: null,
+    scenarioReturnFocus: null,
     returnFocus: null,
     pulseStartedAt: null,
     pulseTargets: new Set(),
@@ -114,6 +117,7 @@
 
   function closeDetail() {
     const returnFocus = state.returnFocus;
+    closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
     closeConflictComparison({ restoreRoute: false });
     detailLayer.hidden = true;
     state.selected = null;
@@ -143,6 +147,7 @@
     if (primary) button.dataset.primary = "true";
     button.addEventListener("click", handler);
     document.querySelector("#detailActions").append(button);
+    return button;
   }
 
   function revealEvidenceConstellation({ announceUpdate = true } = {}) {
@@ -230,6 +235,7 @@
   }
 
   function openConflictView(pathwayId) {
+    closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
     const selectedNode = nodeById.get(state.selected);
     const targetPathwayId =
       pathwayId ??
@@ -249,11 +255,276 @@
     activateConflictPathway(targetPathwayId, { focusCard: true });
   }
 
+  function setScenarioTriggerState(expanded) {
+    document
+      .querySelectorAll('[aria-controls="scenarioChamber"]')
+      .forEach((button) =>
+        button.setAttribute("aria-expanded", String(expanded))
+      );
+  }
+
+  function appendScenarioList(container, title, items, className = "") {
+    const section = makeElement(
+      "section",
+      `scenario-pathway__section ${className}`.trim()
+    );
+    section.append(makeElement("h4", "", title));
+    const list = document.createElement("ul");
+    for (const item of items) list.append(makeElement("li", "", item));
+    section.append(list);
+    container.append(section);
+  }
+
+  function renderScenarioChamber() {
+    const chamber = data.scenarioChamber;
+    document.querySelector("#scenarioChamberTitle").textContent = chamber.title;
+    document.querySelector("#scenarioConditionTitle").textContent =
+      `${chamber.parentRecordId} / ${chamber.conditionClaim.claimId}`;
+    document.querySelector("#scenarioChamberCaveat").textContent = chamber.caveat;
+    document.querySelector("#scenarioChamberRule").textContent =
+      chamber.relationshipRule;
+
+    const conditionFacts = document.querySelector("#scenarioConditionFacts");
+    conditionFacts.replaceChildren();
+    for (const [term, value] of [
+      ["Record", `version ${chamber.parentVersion} / ${chamber.parentStatus}`],
+      ["Shared-memory effect", chamber.parentEffect],
+      ["Place", chamber.conditionClaim.place],
+      ["Time", `${chamber.conditionClaim.time}; exact event interval unknown`],
+      [
+        "Claim review",
+        `${chamber.conditionClaim.claimId} / ${chamber.conditionClaim.label} / ${chamber.conditionClaim.decision} / record effect ${chamber.conditionClaim.recordEffect}`
+      ],
+      [
+        "Boundary review",
+        `${chamber.conditionClaim.boundaryClaimId} / ${chamber.conditionClaim.boundaryLabel} / ${chamber.conditionClaim.boundaryDecision}`
+      ]
+    ]) {
+      const row = document.createElement("div");
+      row.append(
+        makeElement("dt", "", term),
+        makeElement("dd", "", value)
+      );
+      conditionFacts.append(row);
+    }
+
+    const pathways = document.querySelector("#scenarioPathways");
+    pathways.replaceChildren(
+      ...chamber.pathways.map((pathway) => {
+        const active = pathway.id === state.scenarioPathwayId;
+        const corridor = makeElement(
+          "article",
+          `scenario-pathway${active ? " is-active" : ""}`
+        );
+        corridor.dataset.lens = pathway.lens;
+
+        const trigger = makeElement(
+          "button",
+          "scenario-pathway__trigger",
+          `${pathway.lens} / follow this separate path`
+        );
+        trigger.type = "button";
+        trigger.dataset.scenarioPathwayId = pathway.id;
+        trigger.setAttribute("aria-pressed", String(active));
+        trigger.addEventListener("click", () =>
+          activateScenarioPathway(pathway.id)
+        );
+
+        const status = makeElement("p", "scenario-pathway__status");
+        status.append(
+          makeElement("span", "", pathway.label),
+          makeElement("span", "", pathway.status),
+          makeElement("span", "", `Effect ${pathway.effect}`)
+        );
+
+        const record = makeElement("dl", "scenario-pathway__record");
+        for (const [term, value] of [
+          ["Record", `${pathway.recordId} / version ${pathway.recordVersion}`],
+          ["Status", pathway.recordStatus],
+          ["Current answer", pathway.currentAnswer],
+          ["Impact claim", pathway.impactClaimId]
+        ]) {
+          const row = document.createElement("div");
+          row.append(
+            makeElement("dt", "", term),
+            makeElement("dd", "", value)
+          );
+          record.append(row);
+        }
+
+        const question = makeElement("section", "scenario-pathway__section");
+        question.append(
+          makeElement("h4", "", "Separate lens question"),
+          makeElement("p", "scenario-pathway__question", pathway.question)
+        );
+
+        const evidence = makeElement("section", "scenario-pathway__section");
+        evidence.append(makeElement("h4", "", "Available evidence / limits"));
+        for (const item of pathway.availableEvidence) {
+          const trace = makeElement("div", "scenario-evidence");
+          trace.append(
+            makeElement("strong", "", `${item.label} / ${item.scope}`),
+            makeElement("p", "", item.statement),
+            makeElement("small", "", `Limit: ${item.limitation}`)
+          );
+          evidence.append(trace);
+        }
+
+        corridor.append(trigger, status, record, question, evidence);
+        appendScenarioList(
+          corridor,
+          "Hypotheses / not findings",
+          pathway.hypotheses
+        );
+        appendScenarioList(
+          corridor,
+          "Possible case answers / not outcomes",
+          pathway.possibilities
+        );
+
+        const unknown = makeElement(
+          "section",
+          "scenario-pathway__section scenario-pathway__unknown"
+        );
+        unknown.append(
+          makeElement("h4", "", "Current unknown"),
+          makeElement("p", "", pathway.unknown)
+        );
+        corridor.append(unknown);
+
+        appendScenarioList(
+          corridor,
+          "Next evidence needs / not started",
+          pathway.nextEvidenceNeeds
+        );
+
+        const request = makeElement(
+          "section",
+          "scenario-pathway__section scenario-pathway__request"
+        );
+        request.append(
+          makeElement("h4", "", `${pathway.requestLabel} / ${pathway.requestId}`),
+          makeElement("strong", "", pathway.requestStatus),
+          makeElement("p", "", pathway.proposedRequest),
+          makeElement("small", "", pathway.nextReview)
+        );
+
+        const boundary = makeElement(
+          "section",
+          "scenario-pathway__section scenario-pathway__boundary"
+        );
+        boundary.append(
+          makeElement("h4", "", "Native method and stop boundary"),
+          makeElement(
+            "p",
+            "",
+            `${pathway.nativeScenarioLabel} is the native boundary for a future modelled artifact; no model runs here. ${pathway.nativeMappingNote}`
+          ),
+          makeElement("small", "", pathway.hardBoundary)
+        );
+        corridor.append(request, boundary);
+        return corridor;
+      })
+    );
+  }
+
+  function activateScenarioPathway(pathwayId, { focusTrigger = true } = {}) {
+    const pathway =
+      data.scenarioChamber.pathways.find((item) => item.id === pathwayId) ??
+      data.scenarioChamber.pathways[0];
+    state.scenarioPathwayId = pathway.id;
+    state.routeNodes = new Set(pathway.nodeIds);
+    state.focusNodes = new Set(["foundation", ...pathway.nodeIds]);
+    const position = averageNodePosition(pathway.nodeIds);
+    state.camera.targetGoal = position.map((value) => value * 0.2);
+    renderScenarioChamber();
+    orientationTitle.textContent = `${pathway.lens} / separate scenario question`;
+    orientationHint.textContent =
+      `${pathway.currentAnswer} / ${pathway.requestStatus}`;
+    announce(
+      `${pathway.lens} Scenario Chamber pathway. ${pathway.status}. Current answer ${pathway.currentAnswer}. The evidence request is ${pathway.requestStatus}.`
+    );
+    refreshRouteClasses();
+    if (focusTrigger) {
+      document
+        .querySelector(`[data-scenario-pathway-id="${pathway.id}"]`)
+        ?.focus({ preventScroll: true });
+    }
+  }
+
+  function openScenarioChamber(pathwayId) {
+    const initiatingControl = document.activeElement;
+    if (state.selected !== "condition") renderDetail("condition");
+    closeConflictComparison({ restoreRoute: false });
+    state.scenarioReturnFocus = initiatingControl;
+    state.scenarioPathwayId = null;
+    state.routeNodes = new Set([
+      "condition",
+      ...data.scenarioChamber.pathways.map((pathway) => pathway.lensNodeId)
+    ]);
+    state.focusNodes = new Set([
+      "foundation",
+      ...data.scenarioChamber.pathways.flatMap((pathway) => pathway.nodeIds)
+    ]);
+    renderScenarioChamber();
+    if (!scenarioChamberDialog.open) scenarioChamberDialog.showModal();
+    setScenarioTriggerState(true);
+    orientationTitle.textContent = "SCENARIO CHAMBER / READ ONLY";
+    orientationHint.textContent =
+      "three equal lens questions / no run / no shared outcome";
+    announce(
+      "Read-only Scenario Chamber opened. Food, Money, and Sand remain equal and separate. No scenario has run and all current answers remain UNKNOWN / NOT ESTIMABLE."
+    );
+    refreshRouteClasses();
+    if (pathwayId) activateScenarioPathway(pathwayId);
+    else {
+      scenarioChamberDialog
+        .querySelector(".scenario-pathway__trigger")
+        ?.focus({ preventScroll: true });
+    }
+  }
+
+  function closeScenarioChamber({
+    restoreFocus = true,
+    announceUpdate = true
+  } = {}) {
+    if (!scenarioChamberDialog.open) return;
+    scenarioChamberDialog.close();
+    setScenarioTriggerState(false);
+    state.scenarioPathwayId = null;
+    state.routeNodes.clear();
+    state.focusNodes = new Set(["foundation", "condition"]);
+    for (const edge of data.edges) {
+      if (edge.from === "condition") state.focusNodes.add(edge.to);
+      if (edge.to === "condition") state.focusNodes.add(edge.from);
+    }
+    state.evidenceVisible = true;
+    orientationTitle.textContent = nodeById.get("condition").title;
+    orientationHint.textContent =
+      `${nodeById.get("condition").label} · ${nodeById.get("condition").status}`;
+    refreshRouteClasses();
+    if (announceUpdate) {
+      announce(
+        "Scenario Chamber closed. SLC-0001 remains selected, draft, and unchanged."
+      );
+    }
+    const returnFocus = state.scenarioReturnFocus;
+    state.scenarioReturnFocus = null;
+    if (restoreFocus) {
+      const fallback = returnFocus?.closest?.("#navigator")
+        ? document.querySelector("#navigatorButton")
+        : returnFocus;
+      (fallback?.isConnected ? fallback : document.querySelector("#detailTitle"))
+        ?.focus({ preventScroll: true });
+    }
+  }
+
   function renderDetail(nodeId) {
     const node = nodeById.get(nodeId);
     if (!node) return;
 
     if (detailLayer.hidden) state.returnFocus = document.activeElement;
+    closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
     closeConflictComparison({ restoreRoute: false });
     state.selected = node.id;
     state.routeNodes.clear();
@@ -333,10 +604,16 @@
     const actions = document.querySelector("#detailActions");
     actions.replaceChildren();
     if (node.id === "condition") {
+      const scenarioAction = addDetailAction(
+        "Enter read-only Scenario Chamber",
+        () => openScenarioChamber(),
+        true
+      );
+      scenarioAction.setAttribute("aria-controls", "scenarioChamber");
+      scenarioAction.setAttribute("aria-expanded", "false");
       addDetailAction(
         `Inspect ${data.evidenceConstellation.sourceNodeIds.length} source traces`,
-        () => openNavigator("Evidence Constellation"),
-        true
+        () => openNavigator("Evidence Constellation")
       );
       addDetailAction("Open Conflict View", () => openConflictView());
       addDetailAction("Send City Pulse", startCityPulse);
@@ -360,6 +637,17 @@
       addDetailAction("Compare unresolved pathways", () => openConflictView(), true);
     } else if (node.request) {
       addDetailAction("Return to Open Questions", () => openNavigator("Open Questions"), true);
+    }
+    if (["Food", "Money", "Sand"].includes(node.territory)) {
+      const pathway = data.scenarioChamber.pathways.find(
+        (item) => item.lens === node.territory
+      );
+      const scenarioAction = addDetailAction(
+        `Inspect ${node.territory} in Scenario Chamber`,
+        () => openScenarioChamber(pathway?.id)
+      );
+      scenarioAction.setAttribute("aria-controls", "scenarioChamber");
+      scenarioAction.setAttribute("aria-expanded", "false");
     }
     addDetailAction("Return to whole cloud", closeDetail);
 
@@ -388,6 +676,16 @@
       document.querySelector("#detailTitle").focus({ preventScroll: true });
       announce("Conflict View closed. The selected object remains open.");
     });
+  document
+    .querySelector("#scenarioChamberClose")
+    .addEventListener("click", () => closeScenarioChamber());
+  document
+    .querySelector("#scenarioChamberReturn")
+    .addEventListener("click", () => closeScenarioChamber());
+  scenarioChamberDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeScenarioChamber();
+  });
 
   function updateTimelineReadout() {
     const item = data.timeline[state.timelineStage];
@@ -517,6 +815,7 @@
   const navigatorRegionOrder = [
     "City Foundation",
     "Active Work Horizon",
+    "Scenario Chamber",
     "Food Territory",
     "Money Territory",
     "Sand Territory",
@@ -530,6 +829,35 @@
     const root = document.querySelector("#navigatorGroups");
     root.replaceChildren();
     for (const title of navigatorRegionOrder) {
+      if (title === "Scenario Chamber") {
+        const group = makeElement("section", "navigator-group");
+        group.dataset.group = title;
+        group.append(makeElement("h3", "", title));
+        const grid = makeElement("div", "navigator-grid");
+        const card = makeElement("button", "navigator-card");
+        card.type = "button";
+        card.dataset.nodeId = "condition";
+        card.dataset.hierarchy = "2";
+        card.setAttribute("aria-controls", "scenarioChamber");
+        card.setAttribute("aria-expanded", "false");
+        card.append(
+          makeElement(
+            "small",
+            "",
+            `${data.scenarioChamber.label} · ${data.scenarioChamber.status}`
+          ),
+          makeElement("strong", "", data.scenarioChamber.title),
+          makeElement("span", "", data.scenarioChamber.caveat)
+        );
+        card.addEventListener("click", () => {
+          closeLayer("navigator");
+          openScenarioChamber();
+        });
+        grid.append(card);
+        group.append(grid);
+        root.append(group);
+        continue;
+      }
       const matchingNodes = data.nodes.filter((node) => node.region === title);
       if (!matchingNodes.length) continue;
       const group = makeElement("section", "navigator-group");
@@ -628,6 +956,13 @@
   document.querySelector("#resetView").addEventListener("click", resetView);
 
   window.addEventListener("keydown", (event) => {
+    if (scenarioChamberDialog.open) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeScenarioChamber();
+      }
+      return;
+    }
     if (event.target.matches("input, textarea, select")) return;
     if (event.key === "Escape") {
       if (!navigator.hidden) closeLayer("navigator");
@@ -644,6 +979,7 @@
     if (event.key.toLowerCase() === "e") renderDetail("condition");
     if (event.key.toLowerCase() === "q") renderDetail("thoughts");
     if (event.key.toLowerCase() === "c") openConflictView();
+    if (event.key.toLowerCase() === "s") openScenarioChamber();
     if (document.activeElement === canvas) {
       if (event.key === "ArrowLeft") state.camera.yaw -= 0.08;
       if (event.key === "ArrowRight") state.camera.yaw += 0.08;

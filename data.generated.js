@@ -1,6 +1,6 @@
 /* Generated from protected local research authority inputs. */
 window.SCC_DATA = {
-  "schemaVersion": "2.1.0",
+  "schemaVersion": "2.2.0",
   "sourceAuthority": "Protected local Shared Record Core, incident-register, and evidence-brief snapshots; authority files are not part of this public preview",
   "sourceRecords": {
     "incidentRegister": "SLC-0001 incident evidence register - INC-00 to INC-07 and INC-TIME-01",
@@ -2654,6 +2654,279 @@ window.SCC_DATA = {
       }
     ]
   },
+  "scenarioChamber": {
+    "id": "scenario-chamber",
+    "kind": "EXPLORATORY SCENARIO CHAMBER",
+    "title": "SLC-0001 / three separate questions",
+    "label": "PROPOSAL",
+    "status": "HYPOTHETICAL / READ-ONLY / NOT RUN",
+    "effect": "NONE",
+    "currentAnswer": "THREE SEPARATE UNKNOWN / NOT ESTIMABLE ANSWERS",
+    "parentRecordId": "SLC-0001",
+    "parentVersion": 1,
+    "parentStatus": "DRAFT / FOR TEAM REVIEW",
+    "parentEffect": "NONE",
+    "conditionClaim": {
+      "claimId": "CLM-01",
+      "label": "EVIDENCE",
+      "decision": "ACCEPT",
+      "recordEffect": "NONE",
+      "statement": "Roadway flooding and mobility disruption occurred around Iyana-Oworo / Olopomeji approaching Third Mainland Bridge on the morning of 3 July 2024.",
+      "place": "General Iyana-Oworo / Olopomeji approach toward Third Mainland Bridge, Lagos",
+      "time": "Morning, 3 July 2024",
+      "boundaryClaimId": "CLM-02",
+      "boundaryLabel": "ASSUMPTION",
+      "boundaryDecision": "HOLD",
+      "boundaryNote": "The general corridor is used as a working retrieval envelope; it is not established as one exact shared place boundary."
+    },
+    "lensOrder": [
+      "Food",
+      "Money",
+      "Sand"
+    ],
+    "collectionStatus": "NOT STARTED",
+    "relationshipRule": "SHARED PLACE / TIME ORIENTATION ONLY; NO CROSS-LENS CONCLUSION TRANSFER",
+    "caveat": "Explore possible Food, Money, and Sand responses to the same bounded condition. These are hypotheses and possible case answers, not forecasts, observations, simulations, results, or findings. Selecting a pathway changes only this view. It does not change a record, start evidence collection, establish causality, or transfer a result between lenses.",
+    "pathways": [
+      {
+        "id": "scenario-food",
+        "lens": "Food",
+        "lensNodeId": "lens-food",
+        "recordNodeId": "record-food",
+        "unknownNodeId": "thought-food",
+        "requestNodeId": "request-food",
+        "nodeIds": [
+          "condition",
+          "lens-food",
+          "record-food",
+          "thoughts",
+          "thought-food",
+          "request-food"
+        ],
+        "label": "PROPOSAL",
+        "status": "HYPOTHETICAL / READ-ONLY / NOT RUN",
+        "effect": "NONE",
+        "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
+        "recordId": "SLC-0001-FOOD-01",
+        "recordVersion": 1,
+        "recordStatus": "DRAFT / FOR TEAM REVIEW",
+        "impactClaimId": "SLC-0001-FOOD-IMPACT-01",
+        "taskClaimId": "SLC-0001-FOOD-TASK-01",
+        "requestId": "SLC-0001-FOOD-REQ-01",
+        "requestLabel": "PROPOSAL",
+        "requestStatus": "NOT STARTED / REQUIRES SEPARATE REVIEW",
+        "question": "Can one identifiable food-moving journey be related by contemporaneous records to the working corridor and provisional time while preserving planned-versus-observed route distinctions?",
+        "availableEvidence": [
+          {
+            "label": "EVIDENCE",
+            "scope": "BOUNDED OCCURRENCE ONLY",
+            "statement": "Roadway flooding and mobility disruption occurred around Iyana-Oworo / Olopomeji approaching Third Mainland Bridge on the morning of 3 July 2024.",
+            "limitation": "CLM-01 ACCEPT is claim-level and narrow. It does not establish a Food journey, Food impact, or flood-only cause."
+          },
+          {
+            "label": "EVIDENCE",
+            "scope": "METHOD / CAPABILITY, NOT INCIDENT IMPACT",
+            "statement": "The Food authority provides methods for examining supply, access, loss, affordability, diet quality, shocks, and stabilisers.",
+            "limitation": "No incident-linked journey, vehicle, commodity, market, household, price, loss, or cold-chain observation is currently available."
+          }
+        ],
+        "hypotheses": [
+          "If food-carrying vehicles used this corridor during the disruption window, some journeys may have been delayed, rerouted, or cancelled.",
+          "If delay affected temperature-sensitive food without adequate cold chain, loss risk may have increased.",
+          "If commuters or residents could not reach food outlets, household access may have changed even if aggregate city supply did not.",
+          "A corridor delay may have had no material food effect if food flows used other routes, occurred outside the window, or had sufficient schedule or cold-chain resilience."
+        ],
+        "possibilities": [
+          "Completion as planned",
+          "Delay",
+          "Rerouting",
+          "Cancellation",
+          "UNKNOWN / NOT ESTIMABLE"
+        ],
+        "unknown": "No food journey, delivery, market, commodity, household-access, price, or loss outcome is currently linked to this condition with minimally sufficient evidence.",
+        "nextEvidenceNeeds": [
+          "Stable journey identifier",
+          "Contemporaneous food manifest or equivalent",
+          "Explicit corridor-relation record",
+          "Planned and actual journey outcome",
+          "Source provenance and redaction record"
+        ],
+        "proposedRequest": "If separately approved, test one pre-agreed eligible journey from one willing custodian and stop after that single record set.",
+        "nextReview": "Team review must confirm wording, custodian, permission, redaction, and selection rule before action.",
+        "nativeScenarioLabel": "modelled-scenario",
+        "nativeMappingNote": "Food-native labels remain visible. A modelled scenario or synthetic journey is not mapped to EVIDENCE.",
+        "hardBoundary": "Preserve observed on corridor, planned to use corridor, rerouted before entry, and corridor relation unknown as distinct classes. A journey outcome would not by itself establish spoilage, price effects, market effects, a flood-only cause, or a citywide Food impact.",
+        "sourceRefs": [
+          "Shared Record Core snapshot — SLC-0001 / version 0001",
+          "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001",
+          "SLC-0001 evidence-development brief - collection status NOT STARTED"
+        ]
+      },
+      {
+        "id": "scenario-money",
+        "lens": "Money",
+        "lensNodeId": "lens-money",
+        "recordNodeId": "record-money",
+        "unknownNodeId": "thought-money",
+        "requestNodeId": "request-money",
+        "nodeIds": [
+          "condition",
+          "lens-money",
+          "record-money",
+          "thoughts",
+          "thought-money",
+          "request-money"
+        ],
+        "label": "PROPOSAL",
+        "status": "HYPOTHETICAL / READ-ONLY / NOT RUN",
+        "effect": "NONE",
+        "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
+        "recordId": "SLC-0001-MONEY-01",
+        "recordVersion": 1,
+        "recordStatus": "DRAFT / FOR TEAM REVIEW",
+        "impactClaimId": "SLC-0001-MONEY-IMPACT-01",
+        "taskClaimId": "SLC-0001-MONEY-TASK-01",
+        "requestId": "SLC-0001-MONEY-REQ-01",
+        "requestLabel": "PROPOSAL",
+        "requestStatus": "NOT STARTED / REQUIRES SEPARATE REVIEW",
+        "question": "For one consenting and preregistered traveller or corridor-facing business, do contemporaneous records show a specific incident-day money-flow difference against that same case's matched ordinary-day record or payment rule?",
+        "availableEvidence": [
+          {
+            "label": "EVIDENCE",
+            "scope": "BOUNDED OCCURRENCE ONLY",
+            "statement": "Roadway flooding and mobility disruption occurred around Iyana-Oworo / Olopomeji approaching Third Mainland Bridge on the morning of 3 July 2024.",
+            "limitation": "CLM-01 ACCEPT is claim-level and narrow. It does not establish a consenting case, payment, receipt, loss, gain, or flood-only cause."
+          },
+          {
+            "label": "EVIDENCE",
+            "scope": "METHOD / CAPABILITY, NOT INCIDENT IMPACT",
+            "statement": "The Money authority provides a ledger-first method and sourced anchors for reading individual money flows.",
+            "limitation": "Existing Money personas are synthetic or modelled. None is an observed participant or business from this incident."
+          }
+        ],
+        "hypotheses": [
+          "Some travellers may have paid more for rerouting, alternative transport, fuel, or waiting time.",
+          "Some workers or businesses may have lost paid time or sales; others may have experienced no loss or different income opportunities.",
+          "Some households may have shifted spending toward immediate Coping needs and away from savings or Dream expenditure.",
+          "The financial effect may have been negligible for people who stayed home, worked remotely, travelled later, used another route, or did not lose paid time."
+        ],
+        "possibilities": [
+          "Additional cost",
+          "Reduced receipt",
+          "Increased receipt",
+          "No detected difference",
+          "UNKNOWN / NOT ESTIMABLE"
+        ],
+        "unknown": "No fare, fuel, wage, receipt, sales, damage, emergency spending, borrowing, or other money-flow outcome is currently linked to this condition for a defined consenting case.",
+        "nextEvidenceNeeds": [
+          "Preregistered case type and primary money-flow field",
+          "Consenting stable case identifier",
+          "Incident exposure record",
+          "Event-day monetary record",
+          "Matched ordinary-day record or payment rule",
+          "Consent, redaction, provenance, and retention terms"
+        ],
+        "proposedRequest": "If separately approved, preregister one case type, one primary money-flow field, and one comparison rule; request one consenting case and stop after one complete or declined request.",
+        "nextReview": "Team review must confirm preregistration, consent, redaction, retention, and stop conditions before action.",
+        "nativeScenarioLabel": "modelled ledger record",
+        "nativeMappingNote": "Synthetic and modelled personas remain synthetic/modelled and are never mapped to observed EVIDENCE.",
+        "hardBoundary": "Preregister one case type, one primary money-flow field, and one comparison rule before searching or inspecting outcomes. Do not switch fields, turn delay into money without a payment record, or calculate an average Lagos loss.",
+        "sourceRefs": [
+          "Shared Record Core snapshot — SLC-0001 / version 0001",
+          "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001",
+          "SLC-0001 evidence-development brief - collection status NOT STARTED"
+        ]
+      },
+      {
+        "id": "scenario-sand",
+        "lens": "Sand",
+        "lensNodeId": "lens-sand",
+        "recordNodeId": "record-sand",
+        "unknownNodeId": "thought-sand",
+        "requestNodeId": "request-sand",
+        "nodeIds": [
+          "condition",
+          "lens-sand",
+          "record-sand",
+          "thoughts",
+          "thought-sand",
+          "request-sand"
+        ],
+        "label": "PROPOSAL",
+        "status": "HYPOTHETICAL / READ-ONLY / NOT RUN",
+        "effect": "NONE",
+        "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
+        "recordId": "SLC-0001-SAND-01",
+        "recordVersion": 1,
+        "recordStatus": "DRAFT / FOR TEAM REVIEW",
+        "impactClaimId": "SLC-0001-SAND-IMPACT-01",
+        "taskClaimId": "SLC-0001-SAND-TASK-01",
+        "requestId": "SLC-0001-SAND-REQ-01",
+        "requestLabel": "PROPOSAL",
+        "requestStatus": "NOT STARTED / REQUIRES SEPARATE REVIEW",
+        "question": "What, if anything, did the relevant EFAG field team contemporaneously record observing and doing at the Iyana-Oworo / Olopomeji approach on 3 July 2024, and at what recorded times?",
+        "availableEvidence": [
+          {
+            "label": "EVIDENCE",
+            "scope": "BOUNDED OCCURRENCE ONLY",
+            "statement": "Roadway flooding and mobility disruption occurred around Iyana-Oworo / Olopomeji approaching Third Mainland Bridge on the morning of 3 July 2024.",
+            "limitation": "CLM-01 ACCEPT is claim-level and narrow. It does not establish an environmental cause, drainage condition, field action, or intervention effect."
+          },
+          {
+            "label": "EVIDENCE",
+            "scope": "OFFICIAL EXPLANATION ONLY",
+            "statement": "INC-04 records an official rain and lagoon explanation.",
+            "limitation": "The account is not site-connected hydraulic proof; CLM-03 and CLM-04 remain HYPOTHESIS / HOLD."
+          },
+          {
+            "label": "EVIDENCE",
+            "scope": "OFFICIAL DEPLOYMENT / CLEARANCE ACCOUNT ONLY",
+            "statement": "INC-05 records an official EFAG deployment and later road-free account.",
+            "limitation": "Temporal order does not establish field observations, drainage condition, intervention effectiveness, natural recession, or full traffic recovery."
+          },
+          {
+            "label": "DERIVED",
+            "scope": "PUBLIC-POST TIME ONLY",
+            "statement": "INC-TIME-01 derives a public-documentation window from located post timestamps.",
+            "limitation": "Post time is not observation, onset, peak, recession, recovery, or measured event duration."
+          }
+        ],
+        "hypotheses": [
+          "High-intensity or long-duration rainfall and elevated lagoon level jointly reduced the rate at which stormwater could discharge.",
+          "Local drain capacity, inlet blockage, maintenance condition, road elevation, or a hydraulic bottleneck contributed materially.",
+          "Antecedent rainfall, catchment runoff, backwater effects, tide timing, and road or bridge geometry may explain some of the observed extent and recession.",
+          "EFAG intervention accelerated clearance.",
+          "Water would have receded over a similar interval as rain and lagoon level fell, even without the intervention.",
+          "Multiple drivers acted together; no single-driver account may be adequate."
+        ],
+        "possibilities": [
+          "Located and timed observation or action record",
+          "Custodian-verified explicit none / not observed / no action",
+          "Incomplete or dispatch-only record",
+          "No returned record",
+          "UNKNOWN / NOT ESTIMABLE"
+        ],
+        "unknown": "No complete field record currently establishes what EFAG observed or did at the bounded corridor and time, and no environmental cause or intervention effect can be estimated.",
+        "nextEvidenceNeeds": [
+          "Official or custodian-verified incident or job record",
+          "Dispatch, arrival, observation, action, and completion timestamps",
+          "Field-record location precision",
+          "Direct observations or verified explicit-null entries",
+          "Expected field scope, completeness, provenance, edits, and redactions"
+        ],
+        "proposedRequest": "If separately approved, send one bounded written request to the appropriate records custodian for one redacted incident or job record and directly associated field media, then stop after one response.",
+        "nextReview": "Team review must confirm custodian, permission route, request wording, source grading, and stop conditions before action.",
+        "nativeScenarioLabel": "MODELLED/PROJECTED",
+        "nativeMappingNote": "The native Sand label and grade must be preserved beside any shared label; mappings are not treated as perfect equivalence.",
+        "hardBoundary": "A public clearance statement, blank field, dispatch-only record, or temporal sequence cannot establish environmental cause or intervention effect. Do not introduce sand extraction, dredging, reclamation, wetland, sediment, or material-chain causation without site-connected evidence.",
+        "sourceRefs": [
+          "Shared Record Core snapshot — SLC-0001 / version 0001",
+          "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001",
+          "SLC-0001 evidence-development brief - collection status NOT STARTED"
+        ]
+      }
+    ]
+  },
   "interactionClaims": {
     "cityPulse": "INTERACTION DEMONSTRATION ONLY",
     "timeSlider": "KNOWN TIMESTAMPS SEPARATED FROM ILLUSTRATIVE POSITIONING",
@@ -2662,6 +2935,7 @@ window.SCC_DATA = {
     "evidenceConstellation": "TRACEABLE SOURCES REVEALED ON SELECTION; LIMITATIONS STAY VISIBLE",
     "openQuestions": "HOLD, UNKNOWN, AND PROPOSED REQUESTS REMAIN NON-OUTCOMES",
     "conflictView": "OFFICIAL ACCOUNTS AND COMPETING PATHWAYS COMPARED WITHOUT SETTLING CAUSE",
+    "scenarioChamber": "THREE EQUAL READ-ONLY LENS PATHWAYS; NO RUN, PREDICTION, CAUSAL RESULT, OR CROSS-LENS SYNTHESIS",
     "guidedHandover": "READ-ONLY OPTIONAL ROUTE; NON-3D EQUIVALENT PROVIDED",
     "spatialGrammar": "GROUNDED RECORD FIELD; MIDDLE ACTIVE WORK; EQUAL LENS CANOPY; CENTRAL CITY DATUM",
     "materialSystem": "NEAR-BLACK ATLAS; NEUTRAL MATERIALS; MUTED MEANINGFUL ACCENTS",
