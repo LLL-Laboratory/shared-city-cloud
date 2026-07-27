@@ -7,7 +7,7 @@
       name="description"
       content="A read-only spatial prototype for the LLL Laboratory Shared City Cloud."
     />
-    <title>Shared City Cloud Â· Spatial Prototype</title>
+    <title>Shared City Cloud · Spatial Prototype</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./atlas.css" />
   </head>
@@ -35,11 +35,11 @@
 
         <nav class="scene-actions" aria-label="Cloud controls">
           <button id="timelineButton" class="round-action" type="button" aria-expanded="false">
-            <span aria-hidden="true">â—·</span>
+            <span aria-hidden="true">◷</span>
             <span>Time</span>
           </button>
           <button id="handoverButton" class="round-action" type="button" aria-expanded="false">
-            <span aria-hidden="true">â†</span>
+            <span aria-hidden="true">↝</span>
             <span>Guide</span>
           </button>
           <button
@@ -49,7 +49,7 @@
             aria-expanded="false"
             aria-controls="navigator"
           >
-            <span aria-hidden="true">â‰¡</span>
+            <span aria-hidden="true">≡</span>
             <span>Navigator</span>
           </button>
         </nav>
@@ -57,7 +57,7 @@
 
       <section class="orientation" aria-label="Scene orientation">
         <p id="orientationTitle">SECTION 01 / LAGOS</p>
-        <span id="orientationHint">ground records Â· active work Â· equal lens canopy</span>
+        <span id="orientationHint">ground records · active work · equal lens canopy</span>
       </section>
 
       <section id="relationshipLegend" class="relationship-legend" aria-label="Relationship legend">
@@ -77,7 +77,7 @@
             <p class="kicker">Displayed history</p>
             <h2 id="timelineHeading">Known time, honest gaps</h2>
           </div>
-          <button class="icon-button" type="button" data-close="timeline" aria-label="Close timeline">Ã—</button>
+          <button class="icon-button" type="button" data-close="timeline" aria-label="Close timeline">×</button>
         </div>
         <label class="timeline__control">
           <span class="sr-only">Displayed timeline stage</span>
@@ -95,9 +95,9 @@
       </section>
 
       <aside id="detailLayer" class="detail-layer" hidden aria-labelledby="detailTitle">
-        <button class="detail-layer__close icon-button" type="button" aria-label="Close selected object">Ã—</button>
+        <button class="detail-layer__close icon-button" type="button" aria-label="Close selected object">×</button>
         <div class="detail-layer__world-route">
-          <button id="detailBackToWorld" type="button">â† Whole world</button>
+          <button id="detailBackToWorld" type="button">← Whole world</button>
           <span id="detailBreadcrumb"></span>
         </div>
         <p id="detailKind" class="kicker"></p>
@@ -121,9 +121,9 @@
         <div class="route-layer__head">
           <div>
             <p class="kicker">Path Replay</p>
-            <h2 id="pathTitle">A findingâ€™s real local journey</h2>
+            <h2 id="pathTitle">A finding’s real local journey</h2>
           </div>
-          <button class="icon-button" type="button" data-close="path" aria-label="Close path replay">Ã—</button>
+          <button class="icon-button" type="button" data-close="path" aria-label="Close path replay">×</button>
         </div>
         <div id="pathSteps" class="route-steps"></div>
         <p class="route-caveat">Claim-level history only. Current record status remains DRAFT / FOR TEAM REVIEW; shared-memory effect NONE.</p>
@@ -140,7 +140,7 @@
             <p class="kicker">Guided Handover</p>
             <h2 id="guideTitle">The smallest useful way in</h2>
           </div>
-          <button class="icon-button" type="button" data-close="guide" aria-label="Close guided handover">Ã—</button>
+          <button class="icon-button" type="button" data-close="guide" aria-label="Close guided handover">×</button>
         </div>
         <div class="guide-copy">
           <strong id="guideStepTitle"></strong>
@@ -160,7 +160,7 @@
             <h2 id="navigatorTitle">The same research world, without 3D</h2>
             <p>Every object opens the same labels, status, sources, and explicit relationships.</p>
           </div>
-          <button class="icon-button" type="button" data-close="navigator" aria-label="Close navigator">Ã—</button>
+          <button class="icon-button" type="button" data-close="navigator" aria-label="Close navigator">×</button>
         </div>
         <div id="navigatorGroups" class="navigator__groups"></div>
       </aside>
@@ -186,4 +186,3 @@
     <script src="./app.js"></script>
   </body>
 </html>
-
