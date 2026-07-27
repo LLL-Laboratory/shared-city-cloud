@@ -493,7 +493,7 @@ a:focus-visible {
 }
 
 .scene-footer span + span::before {
-  content: "Â·";
+  content: "·";
   margin-right: 10px;
 }
 
@@ -1249,4 +1249,3 @@ a:focus-visible {
     background: white;
   }
 }
-
