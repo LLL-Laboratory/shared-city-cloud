@@ -95,7 +95,7 @@
     app.classList.remove("is-focused");
     state.camera.targetGoal = [0, 0.15, -0.35];
     orientationTitle.textContent = "SECTION 01 / LAGOS";
-    orientationHint.textContent = "ground records Â· active work Â· equal lens canopy";
+    orientationHint.textContent = "ground records · active work · equal lens canopy";
     refreshRouteClasses();
   }
 
@@ -171,7 +171,7 @@
             const item = document.createElement("li");
             item.append(
               makeElement("strong", "", edge.relationshipType ?? edge.kind),
-              makeElement("span", "", `${edge.label} â†’ ${other?.title ?? otherId}`)
+              makeElement("span", "", `${edge.label} → ${other?.title ?? otherId}`)
             );
             return item;
           })
@@ -198,7 +198,7 @@
       node.position[2] * 0.16
     ];
     orientationTitle.textContent = node.title;
-    orientationHint.textContent = `${node.label} Â· ${node.status}`;
+    orientationHint.textContent = `${node.label} · ${node.status}`;
     announce(`${node.title} selected. ${node.label}. ${node.status}.`);
     refreshRouteClasses();
   }
@@ -267,9 +267,9 @@
     );
 
     document.querySelector(".route-caveat").textContent =
-      `${step.date} Â· ${step.label} Â· ${step.state}. ${step.note} Current record status remains DRAFT / FOR TEAM REVIEW; shared-memory effect NONE.`;
+      `${step.date} · ${step.label} · ${step.state}. ${step.note} Current record status remains DRAFT / FOR TEAM REVIEW; shared-memory effect NONE.`;
     orientationTitle.textContent = step.state;
-    orientationHint.textContent = `${step.date} Â· ${step.label}`;
+    orientationHint.textContent = `${step.date} · ${step.label}`;
     announce(`Path Replay step ${state.pathIndex + 1}. ${step.state}. ${step.note}`);
     refreshRouteClasses();
   }
@@ -358,7 +358,7 @@
         card.dataset.nodeId = node.id;
         card.dataset.hierarchy = String(node.hierarchy ?? 3);
         card.append(
-          makeElement("small", "", `${node.label} Â· ${node.status}`),
+          makeElement("small", "", `${node.label} · ${node.status}`),
           makeElement("strong", "", node.title),
           makeElement("span", "", node.short)
         );
@@ -529,7 +529,495 @@
   }
 
   function createProgram(vertexSource, fragmentSource) {
-    const program = gl.createPr…3353 tokens truncated… curvature = 0, strandOffset = 0) {
+    const program = gl.createProgram();
+    gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vertexSource));
+    gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fragmentSource));
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(program));
+    }
+    return program;
+  }
+
+  const meshProgram = createProgram(
+    `
+      attribute vec3 a_position;
+      attribute vec3 a_normal;
+      uniform mat4 u_world;
+      uniform mat4 u_viewProjection;
+      varying vec3 v_normal;
+      varying vec3 v_world;
+      varying vec3 v_local;
+      void main() {
+        vec4 worldPosition = u_world * vec4(a_position, 1.0);
+        gl_Position = u_viewProjection * worldPosition;
+        v_world = worldPosition.xyz;
+        v_local = a_position;
+        v_normal = mat3(u_world) * a_normal;
+      }
+    `,
+    `
+      precision mediump float;
+      uniform vec3 u_color;
+      uniform vec3 u_camera;
+      uniform float u_emphasis;
+      uniform float u_alpha;
+      uniform float u_fragment;
+      varying vec3 v_normal;
+      varying vec3 v_world;
+      varying vec3 v_local;
+      void main() {
+        vec3 normal = normalize(v_normal);
+        vec3 light = normalize(vec3(-0.35, 0.86, 0.42));
+        float diffuse = 0.58 + max(dot(normal, light), 0.0) * 0.24;
+        vec3 viewDirection = normalize(u_camera - v_world);
+        float fresnel = pow(1.0 - abs(dot(normal, viewDirection)), 2.8);
+        vec3 color = u_color * diffuse + fresnel * 0.07;
+        color += u_emphasis * vec3(0.08, 0.08, 0.075);
+
+        vec2 uv = v_local.xy * 0.5 + 0.5;
+        float frame = step(0.82, max(abs(v_local.x), abs(v_local.y)));
+        float scan = step(0.91, fract(uv.y * 12.0));
+        float traceA = 0.34 + sin(uv.x * 12.0 + 0.6) * 0.08;
+        float traceB = 0.64 + cos(uv.x * 9.0 + 1.8) * 0.06;
+        float plotA = 1.0 - smoothstep(0.0, 0.018, abs(uv.y - traceA));
+        float plotB = 1.0 - smoothstep(0.0, 0.014, abs(uv.y - traceB));
+        float halftone = step(0.87, fract(uv.x * 17.0 + floor(uv.y * 10.0) * 0.37));
+        vec3 platePaper = vec3(0.54, 0.54, 0.50);
+        vec3 plateInk = vec3(0.055, 0.06, 0.062);
+        float plateMark = clamp(frame + scan * 0.22 + plotA + plotB * 0.7 + halftone * 0.22, 0.0, 1.0);
+        vec3 plateColor = mix(platePaper, plateInk, plateMark);
+        color = mix(color, plateColor, u_fragment);
+        gl_FragColor = vec4(color, u_alpha);
+      }
+    `
+  );
+
+  const lineProgram = createProgram(
+    `
+      attribute vec3 a_position;
+      uniform mat4 u_viewProjection;
+      void main() {
+        gl_Position = u_viewProjection * vec4(a_position, 1.0);
+      }
+    `,
+    `
+      precision mediump float;
+      uniform vec3 u_color;
+      uniform float u_alpha;
+      void main() {
+        gl_FragColor = vec4(u_color, u_alpha);
+      }
+    `
+  );
+
+  const particleProgram = createProgram(
+    `
+      attribute vec3 a_position;
+      uniform mat4 u_viewProjection;
+      uniform float u_pixelRatio;
+      void main() {
+        vec4 clip = u_viewProjection * vec4(a_position, 1.0);
+        gl_Position = clip;
+        gl_PointSize = clamp((8.0 / max(clip.w, 1.0)) * u_pixelRatio, 0.8, 2.2);
+      }
+    `,
+    `
+      precision mediump float;
+      void main() {
+        vec2 point = gl_PointCoord - vec2(0.5);
+        float alpha = smoothstep(0.5, 0.08, length(point)) * 0.13;
+        gl_FragColor = vec4(0.72, 0.72, 0.68, alpha);
+      }
+    `
+  );
+
+  const meshLocations = {
+    position: gl.getAttribLocation(meshProgram, "a_position"),
+    normal: gl.getAttribLocation(meshProgram, "a_normal"),
+    world: gl.getUniformLocation(meshProgram, "u_world"),
+    viewProjection: gl.getUniformLocation(meshProgram, "u_viewProjection"),
+    color: gl.getUniformLocation(meshProgram, "u_color"),
+    camera: gl.getUniformLocation(meshProgram, "u_camera"),
+    emphasis: gl.getUniformLocation(meshProgram, "u_emphasis"),
+    alpha: gl.getUniformLocation(meshProgram, "u_alpha"),
+    fragment: gl.getUniformLocation(meshProgram, "u_fragment")
+  };
+  const lineLocations = {
+    position: gl.getAttribLocation(lineProgram, "a_position"),
+    viewProjection: gl.getUniformLocation(lineProgram, "u_viewProjection"),
+    color: gl.getUniformLocation(lineProgram, "u_color"),
+    alpha: gl.getUniformLocation(lineProgram, "u_alpha")
+  };
+  const particleLocations = {
+    position: gl.getAttribLocation(particleProgram, "a_position"),
+    viewProjection: gl.getUniformLocation(particleProgram, "u_viewProjection"),
+    pixelRatio: gl.getUniformLocation(particleProgram, "u_pixelRatio")
+  };
+
+  function normalize(vector) {
+    const length = Math.hypot(...vector) || 1;
+    return vector.map((value) => value / length);
+  }
+
+  function subtract(a, b) {
+    return a.map((value, index) => value - b[index]);
+  }
+
+  function cross(a, b) {
+    return [
+      a[1] * b[2] - a[2] * b[1],
+      a[2] * b[0] - a[0] * b[2],
+      a[0] * b[1] - a[1] * b[0]
+    ];
+  }
+
+  function dot(a, b) {
+    return a.reduce((sum, value, index) => sum + value * b[index], 0);
+  }
+
+  function identityMatrix() {
+    return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+  }
+
+  function multiplyMatrices(a, b) {
+    const output = new Float32Array(16);
+    for (let column = 0; column < 4; column += 1) {
+      for (let row = 0; row < 4; row += 1) {
+        output[column * 4 + row] =
+          a[row] * b[column * 4] +
+          a[4 + row] * b[column * 4 + 1] +
+          a[8 + row] * b[column * 4 + 2] +
+          a[12 + row] * b[column * 4 + 3];
+      }
+    }
+    return output;
+  }
+
+  function perspectiveMatrix(fieldOfView, aspect, near, far) {
+    const f = 1 / Math.tan(fieldOfView / 2);
+    const rangeInverse = 1 / (near - far);
+    return new Float32Array([
+      f / aspect,
+      0,
+      0,
+      0,
+      0,
+      f,
+      0,
+      0,
+      0,
+      0,
+      (near + far) * rangeInverse,
+      -1,
+      0,
+      0,
+      near * far * rangeInverse * 2,
+      0
+    ]);
+  }
+
+  function lookAtMatrix(eye, target, up = [0, 1, 0]) {
+    const zAxis = normalize(subtract(eye, target));
+    const xAxis = normalize(cross(up, zAxis));
+    const yAxis = cross(zAxis, xAxis);
+    return new Float32Array([
+      xAxis[0],
+      yAxis[0],
+      zAxis[0],
+      0,
+      xAxis[1],
+      yAxis[1],
+      zAxis[1],
+      0,
+      xAxis[2],
+      yAxis[2],
+      zAxis[2],
+      0,
+      -dot(xAxis, eye),
+      -dot(yAxis, eye),
+      -dot(zAxis, eye),
+      1
+    ]);
+  }
+
+  function translationMatrix(position) {
+    const output = identityMatrix();
+    output[12] = position[0];
+    output[13] = position[1];
+    output[14] = position[2];
+    return output;
+  }
+
+  function scaleMatrix(scale) {
+    const output = identityMatrix();
+    output[0] = scale[0];
+    output[5] = scale[1];
+    output[10] = scale[2];
+    return output;
+  }
+
+  function rotationYMatrix(angle) {
+    const cosine = Math.cos(angle);
+    const sine = Math.sin(angle);
+    return new Float32Array([
+      cosine,
+      0,
+      -sine,
+      0,
+      0,
+      1,
+      0,
+      0,
+      sine,
+      0,
+      cosine,
+      0,
+      0,
+      0,
+      0,
+      1
+    ]);
+  }
+
+  function rotationXMatrix(angle) {
+    const cosine = Math.cos(angle);
+    const sine = Math.sin(angle);
+    return new Float32Array([
+      1,
+      0,
+      0,
+      0,
+      0,
+      cosine,
+      sine,
+      0,
+      0,
+      -sine,
+      cosine,
+      0,
+      0,
+      0,
+      0,
+      1
+    ]);
+  }
+
+  function transformPoint(matrix, point) {
+    const [x, y, z] = point;
+    return [
+      matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12],
+      matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13],
+      matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14],
+      matrix[3] * x + matrix[7] * y + matrix[11] * z + matrix[15]
+    ];
+  }
+
+  function faceMesh(vertices, faces) {
+    const positions = [];
+    const normals = [];
+    for (const face of faces) {
+      const [a, b, c] = face.map((index) => vertices[index]);
+      const normal = normalize(cross(subtract(b, a), subtract(c, a)));
+      for (const vertex of [a, b, c]) {
+        positions.push(...vertex);
+        normals.push(...normal);
+      }
+    }
+    return { positions, normals };
+  }
+
+  function makeSphere(columns = 18, rows = 12) {
+    const positions = [];
+    const normals = [];
+    for (let row = 0; row < rows; row += 1) {
+      const v0 = row / rows;
+      const v1 = (row + 1) / rows;
+      const theta0 = v0 * Math.PI;
+      const theta1 = v1 * Math.PI;
+      for (let column = 0; column < columns; column += 1) {
+        const u0 = column / columns;
+        const u1 = (column + 1) / columns;
+        const phi0 = u0 * Math.PI * 2;
+        const phi1 = u1 * Math.PI * 2;
+        const point = (theta, phi) => [
+          Math.sin(theta) * Math.cos(phi),
+          Math.cos(theta),
+          Math.sin(theta) * Math.sin(phi)
+        ];
+        const quad = [
+          point(theta0, phi0),
+          point(theta1, phi0),
+          point(theta1, phi1),
+          point(theta0, phi1)
+        ];
+        for (const index of [0, 1, 2, 0, 2, 3]) {
+          positions.push(...quad[index]);
+          normals.push(...quad[index]);
+        }
+      }
+    }
+    return { positions, normals };
+  }
+
+  function makeTorus(majorRadius = 0.68, minorRadius = 0.24, columns = 24, rows = 10) {
+    const positions = [];
+    const normals = [];
+    const point = (u, v) => {
+      const phi = u * Math.PI * 2;
+      const theta = v * Math.PI * 2;
+      const radius = majorRadius + minorRadius * Math.cos(theta);
+      return {
+        position: [
+          radius * Math.cos(phi),
+          minorRadius * Math.sin(theta),
+          radius * Math.sin(phi)
+        ],
+        normal: [
+          Math.cos(theta) * Math.cos(phi),
+          Math.sin(theta),
+          Math.cos(theta) * Math.sin(phi)
+        ]
+      };
+    };
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        const quad = [
+          point(column / columns, row / rows),
+          point((column + 1) / columns, row / rows),
+          point((column + 1) / columns, (row + 1) / rows),
+          point(column / columns, (row + 1) / rows)
+        ];
+        for (const index of [0, 1, 2, 0, 2, 3]) {
+          positions.push(...quad[index].position);
+          normals.push(...quad[index].normal);
+        }
+      }
+    }
+    return { positions, normals };
+  }
+
+  const octahedron = faceMesh(
+    [
+      [0, 1, 0],
+      [1, 0, 0],
+      [0, 0, 1],
+      [-1, 0, 0],
+      [0, 0, -1],
+      [0, -1, 0]
+    ],
+    [
+      [0, 1, 2],
+      [0, 2, 3],
+      [0, 3, 4],
+      [0, 4, 1],
+      [5, 2, 1],
+      [5, 3, 2],
+      [5, 4, 3],
+      [5, 1, 4]
+    ]
+  );
+
+  const tetrahedron = faceMesh(
+    [
+      [0, 1, 0],
+      [-0.92, -0.55, 0.62],
+      [0.92, -0.55, 0.62],
+      [0, -0.55, -1]
+    ],
+    [
+      [0, 1, 2],
+      [0, 2, 3],
+      [0, 3, 1],
+      [1, 3, 2]
+    ]
+  );
+
+  const cube = faceMesh(
+    [
+      [-1, -1, -1],
+      [1, -1, -1],
+      [1, 1, -1],
+      [-1, 1, -1],
+      [-1, -1, 1],
+      [1, -1, 1],
+      [1, 1, 1],
+      [-1, 1, 1]
+    ],
+    [
+      [0, 2, 1],
+      [0, 3, 2],
+      [4, 5, 6],
+      [4, 6, 7],
+      [0, 1, 5],
+      [0, 5, 4],
+      [3, 7, 6],
+      [3, 6, 2],
+      [1, 2, 6],
+      [1, 6, 5],
+      [0, 4, 7],
+      [0, 7, 3]
+    ]
+  );
+
+  function uploadMesh(mesh) {
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.positions), gl.STATIC_DRAW);
+    const normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.normals), gl.STATIC_DRAW);
+    return {
+      positionBuffer,
+      normalBuffer,
+      count: mesh.positions.length / 3
+    };
+  }
+
+  const meshes = {
+    sphere: uploadMesh(makeSphere()),
+    torus: uploadMesh(makeTorus()),
+    ring: uploadMesh(makeTorus(0.72, 0.11, 28, 8)),
+    octahedron: uploadMesh(octahedron),
+    diamond: uploadMesh(octahedron),
+    cube: uploadMesh(cube),
+    plate: uploadMesh(cube),
+    tetrahedron: uploadMesh(tetrahedron)
+  };
+
+  const lineBuffer = gl.createBuffer();
+
+  let randomState = 19790527;
+  const random = () => {
+    randomState = (randomState * 1664525 + 1013904223) >>> 0;
+    return randomState / 4294967296;
+  };
+  const particles = [];
+  for (let index = 0; index < 240; index += 1) {
+    const radius = 5 + random() * 9;
+    const angle = random() * Math.PI * 2;
+    particles.push(
+      Math.cos(angle) * radius,
+      (random() - 0.5) * 12,
+      Math.sin(angle) * radius - 5
+    );
+  }
+  const particleBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, particleBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(particles), gl.STATIC_DRAW);
+
+  function nodeFloatPosition(node, time) {
+    if (reducedMotion || node.stable) return [...node.position];
+    const phase = [...node.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) * 0.19;
+    const amplitude = node.thought ? 0.035 : node.fragment ? 0.028 : 0.068;
+    return [
+      node.position[0] + Math.sin(time * 0.00018 + phase) * amplitude * 0.35,
+      node.position[1] + Math.sin(time * 0.00042 + phase) * amplitude,
+      node.position[2] + Math.cos(time * 0.00024 + phase) * amplitude * 0.45
+    ];
+  }
+
+  function curveVertices(from, to, dashed, curvature = 0, strandOffset = 0) {
     const vertices = [];
     const delta = subtract(to, from);
     const distance = Math.hypot(...delta);
@@ -1087,4 +1575,3 @@
   updateTimelineReadout();
   window.requestAnimationFrame(render);
 })();
-
