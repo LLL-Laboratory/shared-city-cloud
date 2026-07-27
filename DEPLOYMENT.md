@@ -18,12 +18,21 @@ literal and bypasses Jekyll processing.
 `PAGES_MANIFEST_SHA256.csv` records the byte count and SHA-256 digest of every
 published artifact file except the manifest itself.
 
+The runtime includes three bounded research utilities in the same spatial
+world and focused reading surface:
+
+- traceable evidence-register nodes revealed from `SLC-0001`;
+- an Open Questions region for holds, unknowns, and proposed requests;
+- a side-by-side Conflict View whose causal pathways remain unresolved.
+
 ## Validation contract
 
 The build fails if protected research state drifts, if browser runtime files
 contain external service requests, or if project-subpath-safe asset references
 are missing. The public artifact also excludes machine-local paths and replaces
-them with stable provenance descriptions.
+them with stable provenance descriptions. It also verifies that the three
+research utilities retain source limitations, `NOT STARTED` request status,
+`HOLD` conflict status, equal lens treatment, and non-3D access.
 
 This static preview does not unlock hosted records, team access, identity,
 database, MCP/API, external AI, analytics, automatic capture, or external data

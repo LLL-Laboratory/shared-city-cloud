@@ -14,6 +14,7 @@
   const pathLayer = document.querySelector("#pathReplay");
   const guideLayer = document.querySelector("#guidedHandover");
   const navigator = document.querySelector("#navigator");
+  const conflictComparison = document.querySelector("#conflictComparison");
   const pulseMessage = document.querySelector("#cityPulseMessage");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -32,6 +33,9 @@
     guideIndex: 0,
     routeNodes: new Set(),
     focusNodes: new Set(),
+    evidenceVisible: false,
+    conflictPathwayId: null,
+    returnFocus: null,
     pulseStartedAt: null,
     pulseTargets: new Set(),
     pointer: null,
@@ -88,15 +92,44 @@
     }
   }
 
+  function closeConflictComparison({ restoreRoute = true } = {}) {
+    conflictComparison.hidden = true;
+    detailLayer.classList.remove("detail-layer--conflict");
+    state.conflictPathwayId = null;
+    if (restoreRoute) {
+      state.routeNodes.clear();
+      state.evidenceVisible =
+        state.selected === "condition" || Boolean(nodeById.get(state.selected)?.evidenceSource);
+      state.focusNodes = new Set(["foundation"]);
+      if (state.selected) {
+        state.focusNodes.add(state.selected);
+        for (const edge of data.edges) {
+          if (edge.from === state.selected) state.focusNodes.add(edge.to);
+          if (edge.to === state.selected) state.focusNodes.add(edge.from);
+        }
+      }
+      refreshRouteClasses();
+    }
+  }
+
   function closeDetail() {
+    const returnFocus = state.returnFocus;
+    closeConflictComparison({ restoreRoute: false });
     detailLayer.hidden = true;
     state.selected = null;
     state.focusNodes.clear();
+    state.routeNodes.clear();
+    state.evidenceVisible = false;
+    state.returnFocus = null;
     app.classList.remove("is-focused");
     state.camera.targetGoal = [0, 0.15, -0.35];
     orientationTitle.textContent = "SECTION 01 / LAGOS";
     orientationHint.textContent = "ground records Â· active work Â· equal lens canopy";
     refreshRouteClasses();
+    const fallback = returnFocus?.closest?.("#navigator")
+      ? document.querySelector("#navigatorButton")
+      : returnFocus;
+    if (fallback?.isConnected) fallback.focus({ preventScroll: true });
   }
 
   function addBadge(container, text, labelClass = "") {
@@ -112,11 +145,119 @@
     document.querySelector("#detailActions").append(button);
   }
 
+  function revealEvidenceConstellation({ announceUpdate = true } = {}) {
+    state.evidenceVisible = true;
+    for (const nodeId of data.evidenceConstellation.sourceNodeIds) {
+      state.focusNodes.add(nodeId);
+    }
+    if (announceUpdate) {
+      announce(
+        `${data.evidenceConstellation.sourceNodeIds.length} traceable source nodes revealed. CLM-01 is accepted only at narrow scope; the record remains draft with effect NONE.`
+      );
+    }
+    refreshRouteClasses();
+  }
+
+  function renderConflictComparison() {
+    const columns = document.querySelector("#conflictComparisonColumns");
+    document.querySelector("#conflictComparisonCaveat").textContent =
+      data.conflictView.caveat;
+    columns.replaceChildren(
+      ...data.conflictView.pathways.map((pathway) => {
+        const card = makeElement(
+          "article",
+          `conflict-card${pathway.id === state.conflictPathwayId ? " is-active" : ""}`
+        );
+        const trigger = makeElement(
+          "button",
+          "conflict-card__trigger",
+          `${pathway.claimIds.join(" + ")} / ${pathway.title}`
+        );
+        trigger.type = "button";
+        trigger.dataset.pathwayId = pathway.id;
+        trigger.setAttribute(
+          "aria-pressed",
+          String(pathway.id === state.conflictPathwayId)
+        );
+        trigger.addEventListener("click", () => activateConflictPathway(pathway.id));
+
+        const status = makeElement("p", "conflict-card__status");
+        status.append(
+          makeElement("span", "", pathway.label),
+          makeElement("span", "", pathway.accountStatus),
+          makeElement("span", "", pathway.review)
+        );
+        const summary = makeElement("p", "conflict-card__summary", pathway.summary);
+        const limits = makeElement("dl", "conflict-card__facts");
+        for (const [term, value] of [
+          ["Source trace", pathway.sourceIds.join(" / ")],
+          ["Limitation", pathway.limitation],
+          ["Needed next", pathway.needed]
+        ]) {
+          const row = document.createElement("div");
+          row.append(makeElement("dt", "", term), makeElement("dd", "", value));
+          limits.append(row);
+        }
+        card.append(trigger, status, summary, limits);
+        return card;
+      })
+    );
+  }
+
+  function activateConflictPathway(pathwayId, { focusCard = true } = {}) {
+    const pathway =
+      data.conflictView.pathways.find((item) => item.id === pathwayId) ??
+      data.conflictView.pathways[0];
+    state.conflictPathwayId = pathway.id;
+    state.routeNodes = new Set(pathway.nodeIds);
+    state.focusNodes = new Set(["foundation", ...pathway.nodeIds]);
+    state.evidenceVisible = true;
+    const position = averageNodePosition(pathway.nodeIds);
+    state.camera.targetGoal = position.map((value) => value * 0.22);
+    renderConflictComparison();
+    orientationTitle.textContent = pathway.title;
+    orientationHint.textContent =
+      `${pathway.label} / ${pathway.review} / no settled cause`;
+    announce(
+      `Conflict View. ${pathway.title}. ${pathway.label}. ${pathway.review}. ${pathway.limitation}`
+    );
+    refreshRouteClasses();
+    if (focusCard) {
+      document
+        .querySelector(`[data-pathway-id="${pathway.id}"]`)
+        ?.focus({ preventScroll: true });
+    }
+  }
+
+  function openConflictView(pathwayId) {
+    const selectedNode = nodeById.get(state.selected);
+    const targetPathwayId =
+      pathwayId ??
+      selectedNode?.conflictBranch ??
+      data.conflictView.pathways.find((pathway) =>
+        pathway.sourceIds.includes(selectedNode?.sourceId)
+      )?.id ??
+      data.conflictView.pathways[0].id;
+    if (
+      state.selected !== "thought-causes" &&
+      !selectedNode?.conflictBranch
+    ) {
+      renderDetail("thought-causes");
+    }
+    conflictComparison.hidden = false;
+    detailLayer.classList.add("detail-layer--conflict");
+    activateConflictPathway(targetPathwayId, { focusCard: true });
+  }
+
   function renderDetail(nodeId) {
     const node = nodeById.get(nodeId);
     if (!node) return;
 
+    if (detailLayer.hidden) state.returnFocus = document.activeElement;
+    closeConflictComparison({ restoreRoute: false });
     state.selected = node.id;
+    state.routeNodes.clear();
+    state.evidenceVisible = node.id === "condition" || Boolean(node.evidenceSource);
     state.focusNodes = new Set([node.id, "foundation"]);
     for (const edge of data.edges) {
       if (edge.from === node.id) state.focusNodes.add(edge.to);
@@ -124,10 +265,13 @@
     }
     app.classList.add("is-focused");
     detailLayer.hidden = false;
+    if (node.id === "condition") revealEvidenceConstellation({ announceUpdate: false });
     document.querySelector("#detailBreadcrumb").textContent =
       `World / ${node.region ?? node.kind} / ${node.title}`;
     document.querySelector("#detailKind").textContent = node.kind;
-    document.querySelector("#detailTitle").textContent = node.title;
+    const detailTitle = document.querySelector("#detailTitle");
+    detailTitle.textContent = node.title;
+    detailTitle.tabIndex = -1;
     document.querySelector("#detailSummary").textContent = node.short;
 
     const badges = document.querySelector("#detailBadges");
@@ -145,6 +289,10 @@
       ["Shared memory", node.effect],
       ["Current answer", node.currentAnswer ?? node.status]
     ];
+    if (node.sourceId) factEntries.push(["Source register ID", node.sourceId]);
+    if (node.requestId) factEntries.push(["Request ID", node.requestId]);
+    if (node.claimIds?.length) factEntries.push(["Claim trace", node.claimIds.join(" / ")]);
+    if (node.reviewScope) factEntries.push(["Review scope", node.reviewScope]);
     for (const [term, description] of factEntries) {
       const wrapper = document.createElement("div");
       wrapper.append(makeElement("dt", "", term), makeElement("dd", "", description));
@@ -169,10 +317,14 @@
             const otherId = edge.from === node.id ? edge.to : edge.from;
             const other = nodeById.get(otherId);
             const item = document.createElement("li");
-            item.append(
+            const relationshipButton = makeElement("button", "relationship-link");
+            relationshipButton.type = "button";
+            relationshipButton.addEventListener("click", () => renderDetail(otherId));
+            relationshipButton.append(
               makeElement("strong", "", edge.relationshipType ?? edge.kind),
               makeElement("span", "", `${edge.label} â†’ ${other?.title ?? otherId}`)
             );
+            item.append(relationshipButton);
             return item;
           })
         : [makeElement("li", "", "No explicit relationship is encoded for this object.")])
@@ -181,14 +333,33 @@
     const actions = document.querySelector("#detailActions");
     actions.replaceChildren();
     if (node.id === "condition") {
-      addDetailAction("Send City Pulse", startCityPulse, true);
+      addDetailAction(
+        `Inspect ${data.evidenceConstellation.sourceNodeIds.length} source traces`,
+        () => openNavigator("Evidence Constellation"),
+        true
+      );
+      addDetailAction("Open Conflict View", () => openConflictView());
+      addDetailAction("Send City Pulse", startCityPulse);
       addDetailAction("Replay governance path", openPathReplay);
     } else if (node.id === "review") {
       addDetailAction("Replay governance path", openPathReplay, true);
     } else if (node.id === "handoff") {
       addDetailAction("Start guided handover", openGuidedHandover, true);
     } else if (node.id === "thoughts") {
-      addDetailAction("Browse unresolved items", () => openNavigator("What Needs Thought?"), true);
+      addDetailAction("Browse every open question", () => openNavigator("Open Questions"), true);
+      addDetailAction("Open Conflict View", () => openConflictView());
+    } else if (node.conflictHub || node.conflictBranch) {
+      addDetailAction(
+        "Compare unresolved pathways",
+        () => openConflictView(node.conflictBranch),
+        true
+      );
+    } else if (
+      ["INC-04", "INC-05", "INC-07", "INC-TIME-01"].includes(node.sourceId)
+    ) {
+      addDetailAction("Compare unresolved pathways", () => openConflictView(), true);
+    } else if (node.request) {
+      addDetailAction("Return to Open Questions", () => openNavigator("Open Questions"), true);
     }
     addDetailAction("Return to whole cloud", closeDetail);
 
@@ -199,1379 +370,14 @@
     ];
     orientationTitle.textContent = node.title;
     orientationHint.textContent = `${node.label} Â· ${node.status}`;
-    announce(`${node.title} selected. ${node.label}. ${node.status}.`);
+    announce(
+      node.id === "condition"
+        ? `${node.title} selected. ${node.label}. ${node.status}. ${data.evidenceConstellation.sourceNodeIds.length} traceable source nodes revealed with limitations.`
+        : `${node.title} selected. ${node.label}. ${node.status}.`
+    );
     refreshRouteClasses();
+    detailTitle.focus({ preventScroll: true });
   }
 
   document.querySelector(".detail-layer__close").addEventListener("click", closeDetail);
-  document.querySelector("#detailBackToWorld").addEventListener("click", closeDetail);
-
-  function updateTimelineReadout() {
-    const item = data.timeline[state.timelineStage];
-    document.querySelector("#timelineDisplay").textContent = item.display;
-    const accuracy = document.querySelector("#timelineAccuracy");
-    accuracy.textContent = item.accuracy;
-    accuracy.style.color = item.stage === 4 ? "var(--illustrative)" : "var(--known)";
-    document.querySelector("#timelineNote").textContent = item.note;
-    announce(`${item.display}. ${item.accuracy}. ${item.note}`);
-  }
-
-  function toggleTimeline(forceOpen) {
-    const shouldOpen = forceOpen ?? timelineLayer.hidden;
-    timelineLayer.hidden = !shouldOpen;
-    document.querySelector("#timelineButton").setAttribute("aria-expanded", String(shouldOpen));
-    if (shouldOpen) {
-      updateTimelineReadout();
-      document.querySelector("#timelineRange").focus();
-    }
-  }
-
-  document.querySelector("#timelineButton").addEventListener("click", () => toggleTimeline());
-  document.querySelector("#timelineRange").addEventListener("input", (event) => {
-    state.timelineStage = Number(event.currentTarget.value);
-    updateTimelineReadout();
-    if (state.selected && nodeById.get(state.selected).stage > state.timelineStage) {
-      closeDetail();
-    }
-  });
-
-  function averageNodePosition(nodeIds) {
-    const positions = nodeIds.map((id) => nodeById.get(id)?.position).filter(Boolean);
-    if (!positions.length) return [0, 0.15, -0.35];
-    return positions
-      .reduce((sum, position) => sum.map((value, index) => value + position[index]), [0, 0, 0])
-      .map((value) => value / positions.length);
-  }
-
-  function updatePathReplay() {
-    const step = data.pathReplay[state.pathIndex];
-    state.routeNodes = new Set(step.nodeIds);
-    const position = averageNodePosition(step.nodeIds);
-    state.camera.targetGoal = position.map((value) => value * 0.26);
-    document.querySelector("#pathCount").textContent =
-      `${state.pathIndex + 1} / ${data.pathReplay.length}`;
-    document.querySelector("#pathPrevious").disabled = state.pathIndex === 0;
-    document.querySelector("#pathNext").disabled =
-      state.pathIndex === data.pathReplay.length - 1;
-
-    const steps = document.querySelector("#pathSteps");
-    steps.replaceChildren(
-      ...data.pathReplay.map((item, index) => {
-        const element = makeElement(
-          "span",
-          `route-step${index < state.pathIndex ? " is-past" : ""}${index === state.pathIndex ? " is-active" : ""}`
-        );
-        element.title = `${item.date}: ${item.state}`;
-        return element;
-      })
-    );
-
-    document.querySelector(".route-caveat").textContent =
-      `${step.date} Â· ${step.label} Â· ${step.state}. ${step.note} Current record status remains DRAFT / FOR TEAM REVIEW; shared-memory effect NONE.`;
-    orientationTitle.textContent = step.state;
-    orientationHint.textContent = `${step.date} Â· ${step.label}`;
-    announce(`Path Replay step ${state.pathIndex + 1}. ${step.state}. ${step.note}`);
-    refreshRouteClasses();
-  }
-
-  function openPathReplay() {
-    closeLayer("guide");
-    pathLayer.hidden = false;
-    state.pathIndex = 0;
-    updatePathReplay();
-    document.querySelector("#pathNext").focus();
-  }
-
-  document.querySelector("#pathPrevious").addEventListener("click", () => {
-    state.pathIndex = Math.max(0, state.pathIndex - 1);
-    updatePathReplay();
-  });
-  document.querySelector("#pathNext").addEventListener("click", () => {
-    state.pathIndex = Math.min(data.pathReplay.length - 1, state.pathIndex + 1);
-    updatePathReplay();
-  });
-
-  function updateGuidedHandover() {
-    const step = data.guidedHandover[state.guideIndex];
-    state.routeNodes = new Set(step.nodeIds);
-    const position = averageNodePosition(step.nodeIds);
-    state.camera.targetGoal = position.map((value) => value * 0.24);
-    document.querySelector("#guideStepTitle").textContent = step.title;
-    document.querySelector("#guideStepBody").textContent = step.body;
-    document.querySelector("#guideCount").textContent =
-      `${state.guideIndex + 1} / ${data.guidedHandover.length}`;
-    document.querySelector("#guidePrevious").disabled = state.guideIndex === 0;
-    document.querySelector("#guideNext").disabled =
-      state.guideIndex === data.guidedHandover.length - 1;
-    orientationTitle.textContent = step.title;
-    orientationHint.textContent = step.body;
-    announce(`Guided handover step ${state.guideIndex + 1}. ${step.title}. ${step.body}`);
-    refreshRouteClasses();
-  }
-
-  function openGuidedHandover() {
-    closeLayer("path");
-    guideLayer.hidden = false;
-    document.querySelector("#handoverButton").setAttribute("aria-expanded", "true");
-    state.guideIndex = 0;
-    updateGuidedHandover();
-    document.querySelector("#guideNext").focus();
-  }
-
-  document.querySelector("#handoverButton").addEventListener("click", () => {
-    if (guideLayer.hidden) openGuidedHandover();
-    else closeLayer("guide");
-  });
-  document.querySelector("#guidePrevious").addEventListener("click", () => {
-    state.guideIndex = Math.max(0, state.guideIndex - 1);
-    updateGuidedHandover();
-  });
-  document.querySelector("#guideNext").addEventListener("click", () => {
-    state.guideIndex = Math.min(data.guidedHandover.length - 1, state.guideIndex + 1);
-    updateGuidedHandover();
-  });
-
-  const navigatorRegionOrder = [
-    "City Foundation",
-    "Active Work Horizon",
-    "Food Territory",
-    "Money Territory",
-    "Sand Territory",
-    "Source / Detail Fragments",
-    "Methods & Handoffs",
-    "What Needs Thought?"
-  ];
-
-  function buildNavigator() {
-    const root = document.querySelector("#navigatorGroups");
-    root.replaceChildren();
-    for (const title of navigatorRegionOrder) {
-      const matchingNodes = data.nodes.filter((node) => node.region === title);
-      if (!matchingNodes.length) continue;
-      const group = makeElement("section", "navigator-group");
-      group.dataset.group = title;
-      group.append(makeElement("h3", "", title));
-      const grid = makeElement("div", "navigator-grid");
-      for (const node of matchingNodes) {
-        const card = makeElement("button", "navigator-card");
-        card.type = "button";
-        card.dataset.nodeId = node.id;
-        card.dataset.hierarchy = String(node.hierarchy ?? 3);
-        card.append(
-          makeElement("small", "", `${node.label} Â· ${node.status}`),
-          makeElement("strong", "", node.title),
-          makeElement("span", "", node.short)
-        );
-        card.addEventListener("click", () => {
-          closeLayer("navigator");
-          renderDetail(node.id);
-        });
-        grid.append(card);
-      }
-      group.append(grid);
-      root.append(group);
-    }
-  }
-
-  function openNavigator(groupTitle) {
-    navigator.hidden = false;
-    document.querySelector("#navigatorButton").setAttribute("aria-expanded", "true");
-    const targetGroup = groupTitle
-      ? navigator.querySelector(`[data-group="${groupTitle}"] .navigator-card`)
-      : navigator.querySelector(".navigator-card");
-    (targetGroup ?? navigator.querySelector("[data-close='navigator']")).focus();
-    announce("Non-3D research object navigator opened.");
-  }
-
-  buildNavigator();
-  document.querySelector("#navigatorButton").addEventListener("click", () => {
-    if (navigator.hidden) openNavigator();
-    else closeLayer("navigator");
-  });
-
-  document.querySelectorAll("[data-close]").forEach((button) => {
-    const layerName = button.getAttribute("data-close");
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      closeLayer(layerName);
-    });
-  });
-
-  function refreshRouteClasses() {
-    for (const [nodeId, element] of labelElements) {
-      element.classList.toggle("is-selected", state.selected === nodeId);
-      element.classList.toggle("is-route", state.routeNodes.has(nodeId));
-      element.classList.toggle(
-        "is-dimmed",
-        Boolean(state.selected) && !state.focusNodes.has(nodeId)
-      );
-    }
-    document.querySelectorAll(".navigator-card").forEach((card) => {
-      card.classList.toggle("is-route", state.routeNodes.has(card.dataset.nodeId));
-    });
-  }
-
-  function startCityPulse() {
-    const now = performance.now();
-    state.pulseStartedAt = now;
-    state.pulseTargets = new Set(["condition"]);
-    for (const edge of data.edges.filter((item) => item.pulseEligible)) {
-      state.pulseTargets.add(edge.from);
-      state.pulseTargets.add(edge.to);
-    }
-    pulseMessage.hidden = false;
-    announce(
-      "City Pulse travelled through the supported condition, research contract, equal lens structure, and claim review. Unknown impacts remained quiet."
-    );
-    window.setTimeout(() => {
-      pulseMessage.hidden = true;
-    }, 4200);
-  }
-
-  function resetView() {
-    state.camera.yaw = -0.12;
-    state.camera.pitch = 0.22;
-    state.camera.distance = 16.4;
-    state.camera.target = [0, 0.15, -0.35];
-    state.camera.targetGoal = [0, 0.15, -0.35];
-    closeDetail();
-    closeLayer("path");
-    closeLayer("guide");
-    announce("Whole cloud view restored.");
-  }
-
-  document.querySelector("#resetView").addEventListener("click", resetView);
-
-  window.addEventListener("keydown", (event) => {
-    if (event.target.matches("input, textarea, select")) return;
-    if (event.key === "Escape") {
-      if (!navigator.hidden) closeLayer("navigator");
-      else if (!pathLayer.hidden) closeLayer("path");
-      else if (!guideLayer.hidden) closeLayer("guide");
-      else if (!timelineLayer.hidden) closeLayer("timeline");
-      else if (!detailLayer.hidden) closeDetail();
-      return;
-    }
-    if (event.key.toLowerCase() === "n") openNavigator();
-    if (event.key.toLowerCase() === "t") toggleTimeline();
-    if (event.key.toLowerCase() === "h") openGuidedHandover();
-    if (document.activeElement === canvas) {
-      if (event.key === "ArrowLeft") state.camera.yaw -= 0.08;
-      if (event.key === "ArrowRight") state.camera.yaw += 0.08;
-      if (event.key === "ArrowUp") state.camera.pitch = Math.min(0.62, state.camera.pitch + 0.06);
-      if (event.key === "ArrowDown") state.camera.pitch = Math.max(-0.5, state.camera.pitch - 0.06);
-    }
-  });
-
-  for (const node of data.nodes) {
-    const button = makeElement("button", "cloud-label");
-    button.type = "button";
-    button.dataset.nodeId = node.id;
-    button.dataset.hierarchy = String(node.hierarchy ?? 3);
-    button.tabIndex = -1;
-    button.setAttribute("aria-label", `Select ${node.title}, ${node.label}`);
-    button.append(makeElement("span", "", node.title), makeElement("small", "", node.label));
-    button.addEventListener("click", () => renderDetail(node.id));
-    labelsLayer.append(button);
-    labelElements.set(node.id, button);
-  }
-
-  for (const guide of data.guides ?? []) {
-    if (!guide.showLabel) continue;
-    const label = makeElement("div", "world-guide-label", guide.title);
-    label.dataset.kind = guide.kind;
-    guideLabelsLayer.append(label);
-    guideLabelElements.set(guide.id, label);
-  }
-
-  for (const marker of data.timeMarkers ?? []) {
-    const label = makeElement("div", "time-field-label", marker.label);
-    label.dataset.stage = String(marker.stage);
-    guideLabelsLayer.append(label);
-    timeLabelElements.set(marker.stage, label);
-  }
-
-  canvas.tabIndex = 0;
-  canvas.setAttribute(
-    "aria-describedby",
-    "orientationHint"
-  );
-
-  const gl = canvas.getContext("webgl", {
-    antialias: true,
-    alpha: true,
-    premultipliedAlpha: false,
-    powerPreference: "high-performance"
-  });
-
-  if (!gl) {
-    canvas.hidden = true;
-    labelsLayer.hidden = true;
-    guideLabelsLayer.hidden = true;
-    orientationTitle.textContent = "3D unavailable";
-    orientationHint.textContent = "The complete non-3D Navigator remains available.";
-    openNavigator();
-    announce("WebGL is unavailable. The non-3D Navigator opened automatically.");
-    return;
-  }
-
-  function compileShader(type, sourceText) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, sourceText);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      const message = gl.getShaderInfoLog(shader);
-      gl.deleteShader(shader);
-      throw new Error(message);
-    }
-    return shader;
-  }
-
-  function createProgram(vertexSource, fragmentSource) {
-    const program = gl.createProgram();
-    gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vertexSource));
-    gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fragmentSource));
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      throw new Error(gl.getProgramInfoLog(program));
-    }
-    return program;
-  }
-
-  const meshProgram = createProgram(
-    `
-      attribute vec3 a_position;
-      attribute vec3 a_normal;
-      uniform mat4 u_world;
-      uniform mat4 u_viewProjection;
-      varying vec3 v_normal;
-      varying vec3 v_world;
-      varying vec3 v_local;
-      void main() {
-        vec4 worldPosition = u_world * vec4(a_position, 1.0);
-        gl_Position = u_viewProjection * worldPosition;
-        v_world = worldPosition.xyz;
-        v_local = a_position;
-        v_normal = mat3(u_world) * a_normal;
-      }
-    `,
-    `
-      precision mediump float;
-      uniform vec3 u_color;
-      uniform vec3 u_camera;
-      uniform float u_emphasis;
-      uniform float u_alpha;
-      uniform float u_fragment;
-      varying vec3 v_normal;
-      varying vec3 v_world;
-      varying vec3 v_local;
-      void main() {
-        vec3 normal = normalize(v_normal);
-        vec3 light = normalize(vec3(-0.35, 0.86, 0.42));
-        float diffuse = 0.58 + max(dot(normal, light), 0.0) * 0.24;
-        vec3 viewDirection = normalize(u_camera - v_world);
-        float fresnel = pow(1.0 - abs(dot(normal, viewDirection)), 2.8);
-        vec3 color = u_color * diffuse + fresnel * 0.07;
-        color += u_emphasis * vec3(0.08, 0.08, 0.075);
-
-        vec2 uv = v_local.xy * 0.5 + 0.5;
-        float frame = step(0.82, max(abs(v_local.x), abs(v_local.y)));
-        float scan = step(0.91, fract(uv.y * 12.0));
-        float traceA = 0.34 + sin(uv.x * 12.0 + 0.6) * 0.08;
-        float traceB = 0.64 + cos(uv.x * 9.0 + 1.8) * 0.06;
-        float plotA = 1.0 - smoothstep(0.0, 0.018, abs(uv.y - traceA));
-        float plotB = 1.0 - smoothstep(0.0, 0.014, abs(uv.y - traceB));
-        float halftone = step(0.87, fract(uv.x * 17.0 + floor(uv.y * 10.0) * 0.37));
-        vec3 platePaper = vec3(0.54, 0.54, 0.50);
-        vec3 plateInk = vec3(0.055, 0.06, 0.062);
-        float plateMark = clamp(frame + scan * 0.22 + plotA + plotB * 0.7 + halftone * 0.22, 0.0, 1.0);
-        vec3 plateColor = mix(platePaper, plateInk, plateMark);
-        color = mix(color, plateColor, u_fragment);
-        gl_FragColor = vec4(color, u_alpha);
-      }
-    `
-  );
-
-  const lineProgram = createProgram(
-    `
-      attribute vec3 a_position;
-      uniform mat4 u_viewProjection;
-      void main() {
-        gl_Position = u_viewProjection * vec4(a_position, 1.0);
-      }
-    `,
-    `
-      precision mediump float;
-      uniform vec3 u_color;
-      uniform float u_alpha;
-      void main() {
-        gl_FragColor = vec4(u_color, u_alpha);
-      }
-    `
-  );
-
-  const particleProgram = createProgram(
-    `
-      attribute vec3 a_position;
-      uniform mat4 u_viewProjection;
-      uniform float u_pixelRatio;
-      void main() {
-        vec4 clip = u_viewProjection * vec4(a_position, 1.0);
-        gl_Position = clip;
-        gl_PointSize = clamp((8.0 / max(clip.w, 1.0)) * u_pixelRatio, 0.8, 2.2);
-      }
-    `,
-    `
-      precision mediump float;
-      void main() {
-        vec2 point = gl_PointCoord - vec2(0.5);
-        float alpha = smoothstep(0.5, 0.08, length(point)) * 0.13;
-        gl_FragColor = vec4(0.72, 0.72, 0.68, alpha);
-      }
-    `
-  );
-
-  const meshLocations = {
-    position: gl.getAttribLocation(meshProgram, "a_position"),
-    normal: gl.getAttribLocation(meshProgram, "a_normal"),
-    world: gl.getUniformLocation(meshProgram, "u_world"),
-    viewProjection: gl.getUniformLocation(meshProgram, "u_viewProjection"),
-    color: gl.getUniformLocation(meshProgram, "u_color"),
-    camera: gl.getUniformLocation(meshProgram, "u_camera"),
-    emphasis: gl.getUniformLocation(meshProgram, "u_emphasis"),
-    alpha: gl.getUniformLocation(meshProgram, "u_alpha"),
-    fragment: gl.getUniformLocation(meshProgram, "u_fragment")
-  };
-  const lineLocations = {
-    position: gl.getAttribLocation(lineProgram, "a_position"),
-    viewProjection: gl.getUniformLocation(lineProgram, "u_viewProjection"),
-    color: gl.getUniformLocation(lineProgram, "u_color"),
-    alpha: gl.getUniformLocation(lineProgram, "u_alpha")
-  };
-  const particleLocations = {
-    position: gl.getAttribLocation(particleProgram, "a_position"),
-    viewProjection: gl.getUniformLocation(particleProgram, "u_viewProjection"),
-    pixelRatio: gl.getUniformLocation(particleProgram, "u_pixelRatio")
-  };
-
-  function normalize(vector) {
-    const length = Math.hypot(...vector) || 1;
-    return vector.map((value) => value / length);
-  }
-
-  function subtract(a, b) {
-    return a.map((value, index) => value - b[index]);
-  }
-
-  function cross(a, b) {
-    return [
-      a[1] * b[2] - a[2] * b[1],
-      a[2] * b[0] - a[0] * b[2],
-      a[0] * b[1] - a[1] * b[0]
-    ];
-  }
-
-  function dot(a, b) {
-    return a.reduce((sum, value, index) => sum + value * b[index], 0);
-  }
-
-  function identityMatrix() {
-    return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-  }
-
-  function multiplyMatrices(a, b) {
-    const output = new Float32Array(16);
-    for (let column = 0; column < 4; column += 1) {
-      for (let row = 0; row < 4; row += 1) {
-        output[column * 4 + row] =
-          a[row] * b[column * 4] +
-          a[4 + row] * b[column * 4 + 1] +
-          a[8 + row] * b[column * 4 + 2] +
-          a[12 + row] * b[column * 4 + 3];
-      }
-    }
-    return output;
-  }
-
-  function perspectiveMatrix(fieldOfView, aspect, near, far) {
-    const f = 1 / Math.tan(fieldOfView / 2);
-    const rangeInverse = 1 / (near - far);
-    return new Float32Array([
-      f / aspect,
-      0,
-      0,
-      0,
-      0,
-      f,
-      0,
-      0,
-      0,
-      0,
-      (near + far) * rangeInverse,
-      -1,
-      0,
-      0,
-      near * far * rangeInverse * 2,
-      0
-    ]);
-  }
-
-  function lookAtMatrix(eye, target, up = [0, 1, 0]) {
-    const zAxis = normalize(subtract(eye, target));
-    const xAxis = normalize(cross(up, zAxis));
-    const yAxis = cross(zAxis, xAxis);
-    return new Float32Array([
-      xAxis[0],
-      yAxis[0],
-      zAxis[0],
-      0,
-      xAxis[1],
-      yAxis[1],
-      zAxis[1],
-      0,
-      xAxis[2],
-      yAxis[2],
-      zAxis[2],
-      0,
-      -dot(xAxis, eye),
-      -dot(yAxis, eye),
-      -dot(zAxis, eye),
-      1
-    ]);
-  }
-
-  function translationMatrix(position) {
-    const output = identityMatrix();
-    output[12] = position[0];
-    output[13] = position[1];
-    output[14] = position[2];
-    return output;
-  }
-
-  function scaleMatrix(scale) {
-    const output = identityMatrix();
-    output[0] = scale[0];
-    output[5] = scale[1];
-    output[10] = scale[2];
-    return output;
-  }
-
-  function rotationYMatrix(angle) {
-    const cosine = Math.cos(angle);
-    const sine = Math.sin(angle);
-    return new Float32Array([
-      cosine,
-      0,
-      -sine,
-      0,
-      0,
-      1,
-      0,
-      0,
-      sine,
-      0,
-      cosine,
-      0,
-      0,
-      0,
-      0,
-      1
-    ]);
-  }
-
-  function rotationXMatrix(angle) {
-    const cosine = Math.cos(angle);
-    const sine = Math.sin(angle);
-    return new Float32Array([
-      1,
-      0,
-      0,
-      0,
-      0,
-      cosine,
-      sine,
-      0,
-      0,
-      -sine,
-      cosine,
-      0,
-      0,
-      0,
-      0,
-      1
-    ]);
-  }
-
-  function transformPoint(matrix, point) {
-    const [x, y, z] = point;
-    return [
-      matrix[0] * x + matrix[4] * y + matrix[8] * z + matrix[12],
-      matrix[1] * x + matrix[5] * y + matrix[9] * z + matrix[13],
-      matrix[2] * x + matrix[6] * y + matrix[10] * z + matrix[14],
-      matrix[3] * x + matrix[7] * y + matrix[11] * z + matrix[15]
-    ];
-  }
-
-  function faceMesh(vertices, faces) {
-    const positions = [];
-    const normals = [];
-    for (const face of faces) {
-      const [a, b, c] = face.map((index) => vertices[index]);
-      const normal = normalize(cross(subtract(b, a), subtract(c, a)));
-      for (const vertex of [a, b, c]) {
-        positions.push(...vertex);
-        normals.push(...normal);
-      }
-    }
-    return { positions, normals };
-  }
-
-  function makeSphere(columns = 18, rows = 12) {
-    const positions = [];
-    const normals = [];
-    for (let row = 0; row < rows; row += 1) {
-      const v0 = row / rows;
-      const v1 = (row + 1) / rows;
-      const theta0 = v0 * Math.PI;
-      const theta1 = v1 * Math.PI;
-      for (let column = 0; column < columns; column += 1) {
-        const u0 = column / columns;
-        const u1 = (column + 1) / columns;
-        const phi0 = u0 * Math.PI * 2;
-        const phi1 = u1 * Math.PI * 2;
-        const point = (theta, phi) => [
-          Math.sin(theta) * Math.cos(phi),
-          Math.cos(theta),
-          Math.sin(theta) * Math.sin(phi)
-        ];
-        const quad = [
-          point(theta0, phi0),
-          point(theta1, phi0),
-          point(theta1, phi1),
-          point(theta0, phi1)
-        ];
-        for (const index of [0, 1, 2, 0, 2, 3]) {
-          positions.push(...quad[index]);
-          normals.push(...quad[index]);
-        }
-      }
-    }
-    return { positions, normals };
-  }
-
-  function makeTorus(majorRadius = 0.68, minorRadius = 0.24, columns = 24, rows = 10) {
-    const positions = [];
-    const normals = [];
-    const point = (u, v) => {
-      const phi = u * Math.PI * 2;
-      const theta = v * Math.PI * 2;
-      const radius = majorRadius + minorRadius * Math.cos(theta);
-      return {
-        position: [
-          radius * Math.cos(phi),
-          minorRadius * Math.sin(theta),
-          radius * Math.sin(phi)
-        ],
-        normal: [
-          Math.cos(theta) * Math.cos(phi),
-          Math.sin(theta),
-          Math.cos(theta) * Math.sin(phi)
-        ]
-      };
-    };
-    for (let row = 0; row < rows; row += 1) {
-      for (let column = 0; column < columns; column += 1) {
-        const quad = [
-          point(column / columns, row / rows),
-          point((column + 1) / columns, row / rows),
-          point((column + 1) / columns, (row + 1) / rows),
-          point(column / columns, (row + 1) / rows)
-        ];
-        for (const index of [0, 1, 2, 0, 2, 3]) {
-          positions.push(...quad[index].position);
-          normals.push(...quad[index].normal);
-        }
-      }
-    }
-    return { positions, normals };
-  }
-
-  const octahedron = faceMesh(
-    [
-      [0, 1, 0],
-      [1, 0, 0],
-      [0, 0, 1],
-      [-1, 0, 0],
-      [0, 0, -1],
-      [0, -1, 0]
-    ],
-    [
-      [0, 1, 2],
-      [0, 2, 3],
-      [0, 3, 4],
-      [0, 4, 1],
-      [5, 2, 1],
-      [5, 3, 2],
-      [5, 4, 3],
-      [5, 1, 4]
-    ]
-  );
-
-  const tetrahedron = faceMesh(
-    [
-      [0, 1, 0],
-      [-0.92, -0.55, 0.62],
-      [0.92, -0.55, 0.62],
-      [0, -0.55, -1]
-    ],
-    [
-      [0, 1, 2],
-      [0, 2, 3],
-      [0, 3, 1],
-      [1, 3, 2]
-    ]
-  );
-
-  const cube = faceMesh(
-    [
-      [-1, -1, -1],
-      [1, -1, -1],
-      [1, 1, -1],
-      [-1, 1, -1],
-      [-1, -1, 1],
-      [1, -1, 1],
-      [1, 1, 1],
-      [-1, 1, 1]
-    ],
-    [
-      [0, 2, 1],
-      [0, 3, 2],
-      [4, 5, 6],
-      [4, 6, 7],
-      [0, 1, 5],
-      [0, 5, 4],
-      [3, 7, 6],
-      [3, 6, 2],
-      [1, 2, 6],
-      [1, 6, 5],
-      [0, 4, 7],
-      [0, 7, 3]
-    ]
-  );
-
-  function uploadMesh(mesh) {
-    const positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.positions), gl.STATIC_DRAW);
-    const normalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mesh.normals), gl.STATIC_DRAW);
-    return {
-      positionBuffer,
-      normalBuffer,
-      count: mesh.positions.length / 3
-    };
-  }
-
-  const meshes = {
-    sphere: uploadMesh(makeSphere()),
-    torus: uploadMesh(makeTorus()),
-    ring: uploadMesh(makeTorus(0.72, 0.11, 28, 8)),
-    octahedron: uploadMesh(octahedron),
-    diamond: uploadMesh(octahedron),
-    cube: uploadMesh(cube),
-    plate: uploadMesh(cube),
-    tetrahedron: uploadMesh(tetrahedron)
-  };
-
-  const lineBuffer = gl.createBuffer();
-
-  let randomState = 19790527;
-  const random = () => {
-    randomState = (randomState * 1664525 + 1013904223) >>> 0;
-    return randomState / 4294967296;
-  };
-  const particles = [];
-  for (let index = 0; index < 240; index += 1) {
-    const radius = 5 + random() * 9;
-    const angle = random() * Math.PI * 2;
-    particles.push(
-      Math.cos(angle) * radius,
-      (random() - 0.5) * 12,
-      Math.sin(angle) * radius - 5
-    );
-  }
-  const particleBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, particleBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(particles), gl.STATIC_DRAW);
-
-  function nodeFloatPosition(node, time) {
-    if (reducedMotion || node.stable) return [...node.position];
-    const phase = [...node.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) * 0.19;
-    const amplitude = node.thought ? 0.035 : node.fragment ? 0.028 : 0.068;
-    return [
-      node.position[0] + Math.sin(time * 0.00018 + phase) * amplitude * 0.35,
-      node.position[1] + Math.sin(time * 0.00042 + phase) * amplitude,
-      node.position[2] + Math.cos(time * 0.00024 + phase) * amplitude * 0.45
-    ];
-  }
-
-  function curveVertices(from, to, dashed, curvature = 0, strandOffset = 0) {
-    const vertices = [];
-    const delta = subtract(to, from);
-    const distance = Math.hypot(...delta);
-    const perpendicular = normalize([-delta[2], 0, delta[0]]);
-    const arc = Math.min(1.65, distance * 0.18) + curvature;
-    const controlA = [
-      from[0] + delta[0] * 0.28 + perpendicular[0] * strandOffset,
-      from[1] + delta[1] * 0.24 + arc * 0.22,
-      from[2] + delta[2] * 0.2 + perpendicular[2] * strandOffset + arc * 0.42
-    ];
-    const controlB = [
-      from[0] + delta[0] * 0.72 + perpendicular[0] * strandOffset,
-      from[1] + delta[1] * 0.76 - arc * 0.08,
-      from[2] + delta[2] * 0.8 + perpendicular[2] * strandOffset + arc * 0.42
-    ];
-    const point = (amount) => {
-      const inverse = 1 - amount;
-      return [
-        inverse ** 3 * from[0] +
-          3 * inverse * inverse * amount * controlA[0] +
-          3 * inverse * amount * amount * controlB[0] +
-          amount ** 3 * to[0],
-        inverse ** 3 * from[1] +
-          3 * inverse * inverse * amount * controlA[1] +
-          3 * inverse * amount * amount * controlB[1] +
-          amount ** 3 * to[1],
-        inverse ** 3 * from[2] +
-          3 * inverse * inverse * amount * controlA[2] +
-          3 * inverse * amount * amount * controlB[2] +
-          amount ** 3 * to[2]
-      ];
-    };
-    const segments = 44;
-    for (let index = 0; index < segments; index += 1) {
-      if (dashed && [2, 3].includes(index % 6)) continue;
-      vertices.push(...point(index / segments), ...point((index + 1) / segments));
-    }
-    return vertices;
-  }
-
-  function ellipseVertices(center, radii, dashed = false) {
-    const vertices = [];
-    const segments = 72;
-    for (let index = 0; index < segments; index += 1) {
-      if (dashed && index % 3 === 1) continue;
-      const point = (amount) => [
-        center[0] + Math.cos(amount * Math.PI * 2) * radii[0],
-        center[1] + Math.sin(amount * Math.PI * 2) * radii[1],
-        center[2]
-      ];
-      vertices.push(...point(index / segments), ...point((index + 1) / segments));
-    }
-    return vertices;
-  }
-
-  function drawGuideVertices(viewProjection, vertices, color, alpha) {
-    if (!vertices.length) return;
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
-    gl.vertexAttribPointer(lineLocations.position, 3, gl.FLOAT, false, 0, 0);
-    gl.uniformMatrix4fv(lineLocations.viewProjection, false, viewProjection);
-    gl.uniform3fv(lineLocations.color, color);
-    gl.uniform1f(lineLocations.alpha, alpha);
-    gl.drawArrays(gl.LINES, 0, vertices.length / 3);
-  }
-
-  function renderGuides(viewProjection, positions) {
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthMask(false);
-    gl.useProgram(lineProgram);
-    gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
-    gl.enableVertexAttribArray(lineLocations.position);
-
-    for (const guide of data.guides ?? []) {
-      if (guide.kind === "ground") {
-        const vertices = [];
-        for (let x = -guide.extentX; x <= guide.extentX + 0.001; x += guide.step) {
-          vertices.push(x, guide.y, -guide.extentZ, x, guide.y, guide.extentZ);
-        }
-        for (let z = -guide.extentZ; z <= guide.extentZ + 0.001; z += guide.step) {
-          vertices.push(-guide.extentX, guide.y, z, guide.extentX, guide.y, z);
-        }
-        drawGuideVertices(viewProjection, vertices, guide.color, guide.alpha);
-        continue;
-      }
-
-      if (guide.kind === "route") {
-        for (let index = 0; index < guide.nodeIds.length - 1; index += 1) {
-          const from = positions.get(guide.nodeIds[index]);
-          const to = positions.get(guide.nodeIds[index + 1]);
-          drawGuideVertices(
-            viewProjection,
-            curveVertices(from, to, false, 0.08),
-            guide.color,
-            guide.alpha
-          );
-        }
-        continue;
-      }
-
-      if (guide.kind === "datum") {
-        drawGuideVertices(
-          viewProjection,
-          [...guide.from, ...guide.to],
-          guide.color,
-          guide.alpha
-        );
-        continue;
-      }
-
-      if (guide.kind === "canopy") {
-        for (let index = 0; index < guide.nodeIds.length - 1; index += 1) {
-          drawGuideVertices(
-            viewProjection,
-            curveVertices(
-              positions.get(guide.nodeIds[index]),
-              positions.get(guide.nodeIds[index + 1]),
-              false,
-              -0.25
-            ),
-            guide.color,
-            guide.alpha
-          );
-        }
-      }
-    }
-
-    const timeVertices = [];
-    const markers = data.timeMarkers ?? [];
-    if (markers.length) {
-      timeVertices.push(
-        markers[0].position[0] - 0.35,
-        markers[0].position[1],
-        markers[0].position[2],
-        markers.at(-1).position[0] + 0.35,
-        markers.at(-1).position[1],
-        markers.at(-1).position[2]
-      );
-      for (const marker of markers) {
-        timeVertices.push(
-          marker.position[0],
-          marker.position[1] - 0.02,
-          marker.position[2],
-          marker.position[0],
-          marker.position[1] + 0.18,
-          marker.position[2]
-        );
-      }
-      drawGuideVertices(viewProjection, timeVertices, [0.55, 0.55, 0.52], 0.18);
-    }
-    gl.depthMask(true);
-  }
-
-  function renderParticles(viewProjection, pixelRatio) {
-    gl.disable(gl.DEPTH_TEST);
-    gl.useProgram(particleProgram);
-    gl.bindBuffer(gl.ARRAY_BUFFER, particleBuffer);
-    gl.enableVertexAttribArray(particleLocations.position);
-    gl.vertexAttribPointer(particleLocations.position, 3, gl.FLOAT, false, 0, 0);
-    gl.uniformMatrix4fv(particleLocations.viewProjection, false, viewProjection);
-    gl.uniform1f(particleLocations.pixelRatio, pixelRatio);
-    gl.drawArrays(gl.POINTS, 0, particles.length / 3);
-  }
-
-  function pulseStrength(time, edgeIndex) {
-    if (state.pulseStartedAt === null) return 0;
-    const elapsed = (time - state.pulseStartedAt) / 1000;
-    if (elapsed > 3.4) {
-      state.pulseStartedAt = null;
-      state.pulseTargets.clear();
-      return 0;
-    }
-    const center = edgeIndex * 0.12 + 0.3;
-    return Math.max(0, 1 - Math.abs(elapsed - center) * 3.2);
-  }
-
-  function edgeColor(edge) {
-    if (edge.kind === "unresolved") return [0.39, 0.4, 0.4];
-    if (edge.kind === "active-route") return [0.48, 0.58, 0.61];
-    if (edge.kind === "equal-standing") return [0.59, 0.59, 0.56];
-    if (edge.kind === "record" || edge.kind === "provenance") return [0.64, 0.63, 0.58];
-    if (edge.kind === "separate-response") return [0.53, 0.55, 0.53];
-    return [0.46, 0.49, 0.49];
-  }
-
-  function edgeStrands(edge) {
-    if (edge.kind === "active-route") return 3;
-    if (edge.kind === "separate-response") return 3;
-    if (edge.kind === "provenance") return 3;
-    if (edge.kind === "method" || edge.kind === "record") return 2;
-    return 1;
-  }
-
-  function renderEdges(viewProjection, positions, time) {
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthMask(false);
-    gl.useProgram(lineProgram);
-    gl.enableVertexAttribArray(lineLocations.position);
-    gl.uniformMatrix4fv(lineLocations.viewProjection, false, viewProjection);
-    gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
-
-    data.edges.forEach((edge, edgeIndex) => {
-      const fromNode = nodeById.get(edge.from);
-      const toNode = nodeById.get(edge.to);
-      if (
-        !fromNode ||
-        !toNode ||
-        fromNode.stage > state.timelineStage ||
-        toNode.stage > state.timelineStage
-      ) {
-        return;
-      }
-      const pulse = edge.pulseEligible ? pulseStrength(time, edgeIndex) : 0;
-      const route = state.routeNodes.has(edge.from) && state.routeNodes.has(edge.to);
-      const focusEdge =
-        !state.selected ||
-        edge.from === state.selected ||
-        edge.to === state.selected ||
-        route;
-      const color = edgeColor(edge);
-      gl.uniform3fv(lineLocations.color, pulse > 0 ? [0.68, 0.34, 0.24] : color);
-      const baseAlpha =
-        pulse > 0
-          ? 0.72
-          : route
-            ? 0.54
-            : edge.kind === "active-route"
-              ? 0.65
-              : edge.quiet
-                ? 0.3
-                : edge.kind === "equal-standing"
-                  ? 0.44
-                  : edge.kind === "record" || edge.kind === "provenance"
-                    ? 0.75
-                    : edge.kind === "separate-response"
-                      ? 0.7
-                      : 0.48;
-      const strands = edgeStrands(edge);
-      for (let strand = 0; strand < strands; strand += 1) {
-        const offset = (strand - (strands - 1) / 2) * 0.055;
-        const vertices = curveVertices(
-          positions.get(edge.from),
-          positions.get(edge.to),
-          edge.dashed,
-          (edgeIndex % 5) * 0.045,
-          offset
-        );
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.DYNAMIC_DRAW);
-        gl.vertexAttribPointer(lineLocations.position, 3, gl.FLOAT, false, 0, 0);
-        gl.uniform1f(
-          lineLocations.alpha,
-          (baseAlpha / Math.max(1, strands * 0.72)) * (focusEdge ? 1 : 0.32)
-        );
-        gl.drawArrays(gl.LINES, 0, vertices.length / 3);
-      }
-    });
-    gl.depthMask(true);
-  }
-
-  function renderNode(node, position, viewProjection, cameraPosition, time) {
-    const mesh = meshes[node.shape] ?? meshes.sphere;
-    const isSelected = state.selected === node.id;
-    const isHovered = state.hovered === node.id;
-    const isRoute = state.routeNodes.has(node.id);
-    const pulseActive =
-      state.pulseStartedAt !== null &&
-      state.pulseTargets.has(node.id) &&
-      !node.quietDuringPulse;
-    const pulseWave = pulseActive
-      ? Math.max(0, Math.sin((time - state.pulseStartedAt) * 0.008))
-      : 0;
-    const future = node.stage > state.timelineStage;
-    const dimmed = Boolean(state.selected) && !state.focusNodes.has(node.id);
-    const emphasis = isSelected || isRoute ? 1 : isHovered ? 0.68 : pulseWave * 0.92;
-    const scale = node.size * (1 + emphasis * 0.12);
-    const scaleVector = (node.scale ?? [1, 1, 1]).map((value) => value * scale);
-    const rotation = node.stable ? 0 : time * 0.00011 + node.position[0] * 0.16;
-    const world = multiplyMatrices(
-      translationMatrix(position),
-      multiplyMatrices(
-        rotationYMatrix(rotation),
-        multiplyMatrices(
-          rotationXMatrix(node.shape === "ring" ? Math.PI / 2.7 : 0),
-          scaleMatrix(scaleVector)
-        )
-      )
-    );
-
-    gl.useProgram(meshProgram);
-    gl.bindBuffer(gl.ARRAY_BUFFER, mesh.positionBuffer);
-    gl.enableVertexAttribArray(meshLocations.position);
-    gl.vertexAttribPointer(meshLocations.position, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer);
-    gl.enableVertexAttribArray(meshLocations.normal);
-    gl.vertexAttribPointer(meshLocations.normal, 3, gl.FLOAT, false, 0, 0);
-    gl.uniformMatrix4fv(meshLocations.world, false, world);
-    gl.uniformMatrix4fv(meshLocations.viewProjection, false, viewProjection);
-    gl.uniform3fv(meshLocations.color, node.color);
-    gl.uniform3fv(meshLocations.camera, cameraPosition);
-    gl.uniform1f(meshLocations.emphasis, emphasis);
-    gl.uniform1f(meshLocations.fragment, node.fragment ? 1 : 0);
-    const baseAlpha = future
-      ? 0.045
-      : node.fragment
-        ? 0.94
-        : node.thought
-          ? 0.48
-          : node.material === "lens"
-            ? 0.72
-            : node.id === "foundation"
-              ? 0.42
-              : node.kind === "IMMUTABLE LENS RECORD"
-                ? 0.76
-                : 0.88;
-    gl.uniform1f(meshLocations.alpha, dimmed ? Math.min(baseAlpha, 0.3) : baseAlpha);
-    gl.drawArrays(gl.TRIANGLES, 0, mesh.count);
-  }
-
-  function shouldShowLabel(node) {
-    if (node.stage > state.timelineStage) return false;
-    if (node.primary) return true;
-    if (state.selected === node.id || state.hovered === node.id || state.routeNodes.has(node.id)) {
-      return true;
-    }
-    if (node.thought && state.selected === "thoughts") return true;
-    if (node.kind === "IMMUTABLE LENS RECORD") {
-      return state.selected === `lens-${node.id.replace("record-", "")}`;
-    }
-    return false;
-  }
-
-  function updateLabels(viewProjection, positions) {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    state.projected.clear();
-    for (const node of data.nodes) {
-      const clip = transformPoint(viewProjection, positions.get(node.id));
-      const element = labelElements.get(node.id);
-      if (clip[3] <= 0.01) {
-        element.classList.remove("is-visible");
-        continue;
-      }
-      const normalizedX = clip[0] / clip[3];
-      const normalizedY = clip[1] / clip[3];
-      const x = (normalizedX * 0.5 + 0.5) * width;
-      const y = (-normalizedY * 0.5 + 0.5) * height;
-      const onScreen = normalizedX > -1.25 && normalizedX < 1.25 && normalizedY > -1.2 && normalizedY < 1.2;
-      const visible = onScreen && shouldShowLabel(node);
-      element.style.left = `${x}px`;
-      const labelTop = node.fragment
-        ? y + 28
-        : node.kind === "LENS"
-          ? y + 24
-          : node.id === "condition"
-            ? y + 25
-            : y - node.size * 26 - 16;
-      element.style.top = `${labelTop}px`;
-      element.classList.toggle("is-visible", visible);
-      state.projected.set(node.id, {
-        x,
-        y,
-        radius: Math.max(20, node.size * 42),
-        depth: clip[3],
-        active: node.stage <= state.timelineStage
-      });
-    }
-    refreshRouteClasses();
-  }
-
-  function updateGuideLabels(viewProjection) {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    for (const guide of data.guides ?? []) {
-      const element = guideLabelElements.get(guide.id);
-      const clip = transformPoint(viewProjection, guide.labelPosition);
-      if (!element || clip[3] <= 0.01) {
-        element?.classList.remove("is-visible");
-        continue;
-      }
-      const normalizedX = clip[0] / clip[3];
-      const normalizedY = clip[1] / clip[3];
-      const onScreen =
-        normalizedX > -1.18 &&
-        normalizedX < 1.18 &&
-        normalizedY > -1.1 &&
-        normalizedY < 1.1;
-      element.style.left = `${(normalizedX * 0.5 + 0.5) * width}px`;
-      element.style.top = `${(-normalizedY * 0.5 + 0.5) * height}px`;
-      element.classList.toggle("is-visible", onScreen);
-    }
-  }
-
-  function updateTimeLabels(viewProjection) {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    for (const marker of data.timeMarkers ?? []) {
-      const element = timeLabelElements.get(marker.stage);
-      const clip = transformPoint(viewProjection, marker.position);
-      if (!element || clip[3] <= 0.01) {
-        element?.classList.remove("is-visible");
-        continue;
-      }
-      const normalizedX = clip[0] / clip[3];
-      const normalizedY = clip[1] / clip[3];
-      const onScreen =
-        normalizedX > -1.12 &&
-        normalizedX < 1.12 &&
-        normalizedY > -1.05 &&
-        normalizedY < 1.05;
-      element.style.left = `${(normalizedX * 0.5 + 0.5) * width}px`;
-      element.style.top = `${(-normalizedY * 0.5 + 0.5) * height + 14}px`;
-      element.classList.toggle(
-        "is-visible",
-        onScreen && marker.stage <= state.timelineStage
-      );
-      element.classList.toggle("is-illustrative", !marker.known);
-    }
-  }
-
-  function resizeCanvas() {
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    const width = Math.max(1, Math.floor(canvas.clientWidth * pixelRatio));
-    const height = Math.max(1, Math.floor(canvas.clientHeight * pixelRatio));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
-    gl.viewport(0, 0, width, height);
-    return pixelRatio;
-  }
-
-  function cameraPosition() {
-    const camera = state.camera;
-    const horizontal = Math.cos(camera.pitch) * camera.distance;
-    return [
-      camera.target[0] + Math.sin(camera.yaw) * horizontal,
-      camera.target[1] + Math.sin(camera.pitch) * camera.distance,
-      camera.target[2] + Math.cos(camera.yaw) * horizontal
-    ];
-  }
-
-  function render(time) {
-    const pixelRatio = resizeCanvas();
-    for (let index = 0; index < 3; index += 1) {
-      state.camera.target[index] +=
-        (state.camera.targetGoal[index] - state.camera.target[index]) * (reducedMotion ? 1 : 0.055);
-    }
-
-    const eye = cameraPosition();
-    const projection = perspectiveMatrix(
-      Math.PI / 4.1,
-      canvas.clientWidth / Math.max(1, canvas.clientHeight),
-      0.1,
-      80
-    );
-    const view = lookAtMatrix(eye, state.camera.target);
-    const viewProjection = multiplyMatrices(projection, view);
-    const positions = new Map(
-      data.nodes.map((node) => [node.id, nodeFloatPosition(node, time)])
-    );
-
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LEQUAL);
-
-    renderParticles(viewProjection, pixelRatio);
-    renderGuides(viewProjection, positions);
-    renderEdges(viewProjection, positions, time);
-    for (const node of data.nodes) {
-      renderNode(node, positions.get(node.id), viewProjection, eye, time);
-    }
-    updateLabels(viewProjection, positions);
-    updateGuideLabels(viewProjection);
-    updateTimeLabels(viewProjection);
-    window.requestAnimationFrame(render);
-  }
-
-  function pickNode(clientX, clientY) {
-    const rectangle = canvas.getBoundingClientRect();
-    const x = clientX - rectangle.left;
-    const y = clientY - rectangle.top;
-    let winner = null;
-    let bestScore = Number.POSITIVE_INFINITY;
-    for (const [nodeId, projected] of state.projected) {
-      if (!projected.active) continue;
-      const distance = Math.hypot(projected.x - x, projected.y - y);
-      if (distance <= projected.radius) {
-        const score = distance + projected.depth * 0.15;
-        if (score < bestScore) {
-          bestScore = score;
-          winner = nodeId;
-        }
-      }
-    }
-    return winner;
-  }
-
-  canvas.addEventListener("pointerdown", (event) => {
-    canvas.setPointerCapture(event.pointerId);
-    state.pointer = {
-      id: event.pointerId,
-      startX: event.clientX,
-      startY: event.clientY,
-      previousX: event.clientX,
-      previousY: event.clientY,
-      moved: false
-    };
-    canvas.classList.add("is-dragging");
-  });
-
-  canvas.addEventListener("pointermove", (event) => {
-    if (state.pointer?.id === event.pointerId) {
-      const deltaX = event.clientX - state.pointer.previousX;
-      const deltaY = event.clientY - state.pointer.previousY;
-      if (Math.hypot(event.clientX - state.pointer.startX, event.clientY - state.pointer.startY) > 5) {
-        state.pointer.moved = true;
-      }
-      if (state.pointer.moved) {
-        state.camera.yaw -= deltaX * 0.006;
-        state.camera.pitch = Math.max(-0.52, Math.min(0.66, state.camera.pitch + deltaY * 0.005));
-      }
-      state.pointer.previousX = event.clientX;
-      state.pointer.previousY = event.clientY;
-      return;
-    }
-    state.hovered = pickNode(event.clientX, event.clientY);
-  });
-
-  function finishPointer(event) {
-    if (!state.pointer || state.pointer.id !== event.pointerId) return;
-    if (!state.pointer.moved) {
-      const picked = pickNode(event.clientX, event.clientY);
-      if (picked) renderDetail(picked);
-    }
-    state.pointer = null;
-    canvas.classList.remove("is-dragging");
-  }
-
-  canvas.addEventListener("pointerup", finishPointer);
-  canvas.addEventListener("pointercancel", finishPointer);
-  canvas.addEventListener("pointerleave", () => {
-    if (!state.pointer) state.hovered = null;
-  });
-  canvas.addEventListener(
-    "wheel",
-    (event) => {
-      event.preventDefault();
-      state.camera.distance = Math.max(8.2, Math.min(22, state.camera.distance + event.deltaY * 0.009));
-    },
-    { passive: false }
-  );
-
-  updateTimelineReadout();
-  window.requestAnimationFrame(render);
-})();
+  document.querySelector("#detailBackToWorld").addEventListener("click", close×N¸ŞÚ$z{-®éÜj×Â“°¢vÂçVæ–f÷&ÔÖG&—ƒFgb‡'F–6ÆTÆö6F–öç2çf–Wu&ö¦V7F–öâÂfÇ6RÂf–Wu&ö¦V7F–öâ“°¢vÂçVæ–f÷&Ób‡'F–6ÆTÆö6F–öç2ç—†VÅ&F–òÂ—†VÅ&F–ò“°¢vÂæG&t'&—2†vÂåô”åE2ÂÂ'F–6ÆW2æÆVæwF‚ò2“°¢Ğ ¢gVæ7F–öâVÇ6U7G&VæwF‚‡F–ÖRÂVFvT–æFW‚’°¢–b‡7FFRçVÇ6U7F'FVDBÓÓÒçVÆÂ’&WGW&â°¢6öç7BVÆ6VBÒ‡F–ÖRÒ7FFRçVÇ6U7F'FVDB’ò°¢–b†VÆ6VBâ2ãB’°¢7FFRçVÇ6U7F'FVDBÒçVÆÃ°¢7FFRçVÇ6UF&vWG2æ6ÆV"‚“°¢&WGW&â°¢Ğ¢6öç7B6VçFW"ÒVFvT–æFW‚¢ã"²ã3°¢&WGW&âÖF‚æÖ‚ƒÂÒÖF‚æ'2†VÆ6VBÒ6VçFW"’¢2ã"“°¢Ğ ¢gVæ7F–öâVFvT6öÆ÷"†VFvR’°¢–b†VFvRæ¶–æBÓÓÒ&Wf–FVæ6R×G&6R"’&WGW&â³ãcbÂãcBÂãSeÓ°¢–b†VFvRæ¶–æBÓÓÒ'Vç&W6öÇfVB"’&WGW&â³ã3’ÂãBÂãEÓ°¢–b†VFvRæ¶–æBÓÓÒ&7F—fR×&÷WFR"’&WGW&â³ãC‚ÂãS‚ÂãcÓ°¢–b†VFvRæ¶–æBÓÓÒ&WVÂ×7FæF–ær"’&WGW&â³ãS’ÂãS’ÂãSeÓ°¢–b†VFvRæ¶–æBÓÓÒ'&V6÷&B"ÇÂVFvRæ¶–æBÓÓÒ'&÷fVææ6R"’&WGW&â³ãcBÂãc2ÂãS…Ó°¢–b†VFvRæ¶–æBÓÓÒ'6W&FR×&W7öç6R"’&WGW&â³ãS2ÂãSRÂãS5Ó°¢&WGW&â³ãCbÂãC’ÂãC•Ó°¢Ğ ¢gVæ7F–öâVFvU7G&æG2†VFvR’°¢–b†VFvRæ¶–æBÓÓÒ&Wf–FVæ6R×G&6R"’&WGW&â#°¢–b†VFvRæ¶–æBÓÓÒ&7F—fR×&÷WFR"’&WGW&â3°¢–b†VFvRæ¶–æBÓÓÒ'6W&FR×&W7öç6R"’&WGW&â3°¢–b†VFvRæ¶–æBÓÓÒ'&÷fVææ6R"’&WGW&â3°¢–b†VFvRæ¶–æBÓÓÒ&ÖWF†öB"ÇÂVFvRæ¶–æBÓÓÒ'&V6÷&B"’&WGW&â#°¢&WGW&â°¢Ğ ¢gVæ7F–öâ&VæFW$VFvW2‡f–Wu&ö¦V7F–öâÂ÷6—F–öç2ÂF–ÖR’°¢vÂæVæ&ÆR†vÂäDUD…õDU5B“°¢vÂæFWF„Ö6²†fÇ6R“°¢vÂçW6U&öw&Ò†Æ–æU&öw&Ò“°¢vÂæVæ&ÆUfW'FW„GG&–$'&’†Æ–æTÆö6F–öç2ç÷6—F–öâ“°¢vÂçVæ–f÷&ÔÖG&—ƒFgb†Æ–æTÆö6F–öç2çf–Wu&ö¦V7F–öâÂfÇ6RÂf–Wu&ö¦V7F–öâ“°¢vÂæ&–æD'VffW"†vÂä%$•ô%TddU"ÂÆ–æT'VffW"“° ¢FFæVFvW2æf÷$V6‚‚†VFvRÂVFvT–æFW‚’Óâ°¢–b†VFvRæWf–FVæ6TöæÇ’bb7FFRæWf–FVæ6Uf—6–&ÆR’&WGW&ã°¢6öç7Bg&öÔæöFRÒæöFT'”–BævWB†VFvRæg&öÒ“°¢6öç7BFôæöFRÒæöFT'”–BævWB†VFvRçFò“°¢–b€¢g&öÔæöFRÇÀ¢FôæöFRÇÀ¢g&öÔæöFRç7FvRâ7FFRçF–ÖVÆ–æU7FvRÇÀ¢FôæöFRç7FvRâ7FFRçF–ÖVÆ–æU7FvP¢’°¢&WGW&ã°¢Ğ¢6öç7BVÇ6RÒVFvRçVÇ6TVÆ–v–&ÆRòVÇ6U7G&VæwF‚‡F–ÖRÂVFvT–æFW‚’¢°¢6öç7B&÷WFRÒ7FFRç&÷WFTæöFW2æ†2†VFvRæg&öÒ’bb7FFRç&÷WFTæöFW2æ†2†VFvRçFò“°¢6öç7Bfö7W4VFvRĞ¢7FFRç6VÆV7FVBÇÀ¢VFvRæg&öÒÓÓÒ7FFRç6VÆV7FVBÇÀ¢VFvRçFòÓÓÒ7FFRç6VÆV7FVBÇÀ¢&÷WFS°¢6öç7B6öÆ÷"ÒVFvT6öÆ÷"†VFvR“°¢vÂçVæ–f÷&Ó6gb†Æ–æTÆö6F–öç2æ6öÆ÷"ÂVÇ6Râò³ãc‚Âã3BÂã#EÒ¢6öÆ÷"“°¢6öç7B&6TÇ†Ğ¢VÇ6Râ ¢òãs ¢¢&÷WFP¢òãS@¢¢VFvRæ¶–æBÓÓÒ&7F—fR×&÷WFR ¢òãcP¢¢VFvRæ¶–æBÓÓÒ&Wf–FVæ6R×G&6R ¢òãS ¢¢VFvRçV–W@¢òã0¢¢VFvRæ¶–æBÓÓÒ&WVÂ×7FæF–ær ¢òãC@¢¢VFvRæ¶–æBÓÓÒ'&V6÷&B"ÇÂVFvRæ¶–æBÓÓÒ'&÷fVææ6R ¢òãsP¢¢VFvRæ¶–æBÓÓÒ'6W&FR×&W7öç6R ¢òãp¢¢ãCƒ°¢6öç7B7G&æG2ÒVFvU7G&æG2†VFvR“°¢f÷"†ÆWB7G&æBÒ²7G&æBÂ7G&æG3²7G&æB³Ò’°¢6öç7Böfg6WBÒ‡7G&æBÒ‡7G&æG2Ò’ò"’¢ãSS°¢6öç7BfW'F–6W2Ò7W'fUfW'F–6W2€¢÷6—F–öç2ævWB†VFvRæg&öÒ’À¢÷6—F–öç2ævWB†VFvRçFò’À¢VFvRæF6†VBÀ¢†VFvT–æFW‚RR’¢ãCRÀ¢öfg6W@¢“°¢vÂæ'VffW$FF†vÂä%$•ô%TddU"ÂæWrfÆöC3$'&’‡fW'F–6W2’ÂvÂäE”äÔ”5ôE$r“°¢vÂçfW'FW„GG&–%ö–çFW"†Æ–æTÆö6F–öç2ç÷6—F–öâÂ2ÂvÂädÄôBÂfÇ6RÂÂ“°¢vÂçVæ–f÷&Ób€¢Æ–æTÆö6F–öç2æÇ†À¢†&6TÇ†òÖF‚æÖ‚ƒÂ7G&æG2¢ãs"’’¢†fö7W4VFvRò¢ã3"¢“°¢vÂæG&t'&—2†vÂäÄ”äU2ÂÂfW'F–6W2æÆVæwF‚ò2“°¢Ğ¢Ò“°¢vÂæFWF„Ö6²‡G'VR“°¢Ğ ¢gVæ7F–öâ&VæFW$æöFR†æöFRÂ÷6—F–öâÂf–Wu&ö¦V7F–öâÂ6ÖW&÷6—F–öâÂF–ÖR’°¢6öç7BÖW6‚ÒÖW6†W5¶æöFRç6†UÒóòÖW6†W2ç7†W&S°¢6öç7B—56VÆV7FVBÒ7FFRç6VÆV7FVBÓÓÒæöFRæ–C°¢6öç7B—4†÷fW&VBÒ7FFRæ†÷fW&VBÓÓÒæöFRæ–C°¢6öç7B—5&÷WFRÒ7FFRç&÷WFTæöFW2æ†2†æöFRæ–B“°¢–b†æöFRæWf–FVæ6U6÷W&6Rbb7FFRæWf–FVæ6Uf—6–&ÆRbb—56VÆV7FVBbb—5&÷WFR’&WGW&ã°¢6öç7BVÇ6T7F—fRĞ¢7FFRçVÇ6U7F'FVDBÓÒçVÆÂb`¢7FFRçVÇ6UF&vWG2æ†2†æöFRæ–B’b`¢æöFRçV–WDGW&–æuVÇ6S°¢6öç7BVÇ6UvfRÒVÇ6T7F—fP¢òÖF‚æÖ‚ƒÂÖF‚ç6–â‚‡F–ÖRÒ7FFRçVÇ6U7F'FVDB’¢ã‚’¢¢°¢6öç7BgWGW&RÒæöFRç7FvRâ7FFRçF–ÖVÆ–æU7FvS°¢6öç7BF–ÖÖVBÒ&ööÆVâ‡7FFRç6VÆV7FVB’bb7FFRæfö7W4æöFW2æ†2†æöFRæ–B“°¢6öç7BV×†6—2Ò—56VÆV7FVBÇÂ—5&÷WFRò¢—4†÷fW&VBòãc‚¢VÇ6UvfR¢ã“#°¢6öç7B66ÆRÒæöFRç6—¦R¢ƒ²V×†6—2¢ã"“°¢6öç7B66ÆUfV7F÷"Ò†æöFRç66ÆRóò³ÂÂÒ’æÖ‚‡fÇVR’ÓâfÇVR¢66ÆR“°¢6öç7B&÷FF–öâÒæöFRç7F&ÆRò¢F–ÖR¢ã²æöFRç÷6—F–öå³Ò¢ãc°¢6öç7Bv÷&ÆBÒ×VÇF—Ç”ÖG&–6W2€¢G&ç6ÆF–öäÖG&—‚‡÷6—F–öâ’À¢×VÇF—Ç”ÖG&–6W2€¢&÷FF–öå”ÖG&—‚‡&÷FF–öâ’À¢×VÇF—Ç”ÖG&–6W2€¢&÷FF–öå„ÖG&—‚†æöFRç6†RÓÓÒ'&–ær"òÖF‚å’ò"ãr¢’À¢66ÆTÖG&—‚‡66ÆUfV7F÷"¢¢¢“° ¢vÂçW6U&öw&Ò†ÖW6…&öw&Ò“°¢vÂæ&–æD'VffW"†vÂä%$•ô%TddU"ÂÖW6‚ç÷6—F–öä'VffW"“°¢vÂæVæ&ÆUfW'FW„GG&–$'&’†ÖW6„Æö6F–öç2ç÷6—F–öâ“°¢vÂçfW'FW„GG&–%ö–çFW"†ÖW6„Æö6F–öç2ç÷6—F–öâÂ2ÂvÂädÄôBÂfÇ6RÂÂ“°¢vÂæ&–æD'VffW"†vÂä%$•ô%TddU"ÂÖW6‚ææ÷&ÖÄ'VffW"“°¢vÂæVæ&ÆUfW'FW„GG&–$'&’†ÖW6„Æö6F–öç2ææ÷&ÖÂ“°¢vÂçfW'FW„GG&–%ö–çFW"†ÖW6„Æö6F–öç2ææ÷&ÖÂÂ2ÂvÂädÄôBÂfÇ6RÂÂ“°¢vÂçVæ–f÷&ÔÖG&—ƒFgb†ÖW6„Æö6F–öç2çv÷&ÆBÂfÇ6RÂv÷&ÆB“°¢vÂçVæ–f÷&ÔÖG&—ƒFgb†ÖW6„Æö6F–öç2çf–Wu&ö¦V7F–öâÂfÇ6RÂf–Wu&ö¦V7F–öâ“°¢vÂçVæ–f÷&Ó6gb†ÖW6„Æö6F–öç2æ6öÆ÷"ÂæöFRæ6öÆ÷"“°¢vÂçVæ–f÷&Ó6gb†ÖW6„Æö6F–öç2æ6ÖW&Â6ÖW&÷6—F–öâ“°¢vÂçVæ–f÷&Ób†ÖW6„Æö6F–öç2æV×†6—2ÂV×†6—2“°¢vÂçVæ–f÷&Ób†ÖW6„Æö6F–öç2æg&vÖVçBÂæöFRæg&vÖVçBÇÂæöFRæWf–FVæ6U6÷W&6Rò¢“°¢6öç7B&6TÇ†ÒgWGW&P¢òãCP¢¢æöFRæWf–FVæ6U6÷W&6P¢òãƒ€¢¢æöFRæg&vÖVç@¢òã“@¢¢æöFRçF†÷Vv‡@¢òãC€¢¢æöFRæÖFW&–ÂÓÓÒ&ÆVç2 ¢òãs ¢¢æöFRæ–BÓÓÒ&f÷VæFF–öâ ¢òãC ¢¢æöFRæ¶–æBÓÓÒ$”ÔÕUD$ÄRÄTå2$T4õ$B ¢òãs`¢¢ãƒƒ°¢vÂçVæ–f÷&Ób†ÖW6„Æö6F–öç2æÇ†ÂF–ÖÖVBòÖF‚æÖ–â†&6TÇ†Âã2’¢&6TÇ†“°¢vÂæG&t'&—2†vÂåE$”ätÄU2ÂÂÖW6‚æ6÷VçB“°¢Ğ ¢gVæ7F–öâ6†÷VÆE6†÷tÆ&VÂ†æöFR’°¢–b†æöFRç7FvRâ7FFRçF–ÖVÆ–æU7FvR’&WGW&âfÇ6S°¢–b†æöFRæWf–FVæ6U6÷W&6R’&WGW&â7FFRæWf–FVæ6Uf—6–&ÆS°¢–b†æöFRç&–Ö'’’&WGW&âG'VS°¢–b‡7FFRç6VÆV7FVBÓÓÒæöFRæ–BÇÂ7FFRæ†÷fW&VBÓÓÒæöFRæ–BÇÂ7FFRç&÷WFTæöFW2æ†2†æöFRæ–B’’°¢&WGW&âG'VS°¢Ğ¢–b†æöFRçF†÷Vv‡Bbb7FFRç6VÆV7FVBÓÓÒ'F†÷Vv‡G2"’&WGW&âG'VS°¢–b†æöFRæ¶–æBÓÓÒ$”ÔÕUD$ÄRÄTå2$T4õ$B"’°¢&WGW&â7FFRç6VÆV7FVBÓÓÒÆVç2ÒG¶æöFRæ–Bç&WÆ6R‚'&V6÷&BÒ"Â""—Ö°¢Ğ¢&WGW&âfÇ6S°¢Ğ ¢gVæ7F–öâWFFTÆ&VÇ2‡f–Wu&ö¦V7F–öâÂ÷6—F–öç2’°¢6öç7Bv–GF‚Ò6çf2æ6Æ–VçEv–GFƒ°¢6öç7B†V–v‡BÒ6çf2æ6Æ–VçD†V–v‡C°¢7FFRç&ö¦V7FVBæ6ÆV"‚“°¢f÷"†6öç7BæöFRöbFFææöFW2’°¢6öç7B6Æ—ÒG&ç6f÷&Õö–çB‡f–Wu&ö¦V7F–öâÂ÷6—F–öç2ævWB†æöFRæ–B’“°¢6öç7BVÆVÖVçBÒÆ&VÄVÆVÖVçG2ævWB†æöFRæ–B“°¢–b†6Æ—³5ÒÃÒã’°¢VÆVÖVçBæ6Æ74Æ—7Bç&VÖ÷fR‚&—2×f—6–&ÆR"“°¢6öçF–çVS°¢Ğ¢6öç7Bæ÷&ÖÆ—¦VE‚Ò6Æ—³Òò6Æ—³5Ó°¢6öç7Bæ÷&ÖÆ—¦VE’Ò6Æ—³Òò6Æ—³5Ó°¢6öç7B‚Ò†æ÷&ÖÆ—¦VE‚¢ãR²ãR’¢v–GFƒ°¢6öç7B’Ò‚Öæ÷&ÖÆ—¦VE’¢ãR²ãR’¢†V–v‡C°¢6öç7Böå67&VVâÒæ÷&ÖÆ—¦VE‚âÓã#Rbbæ÷&ÖÆ—¦VE‚Âã#Rbbæ÷&ÖÆ—¦VE’âÓã"bbæ÷&ÖÆ—¦VE’Âã#°¢6öç7Bf—6–&ÆRÒöå67&VVâbb6†÷VÆE6†÷tÆ&VÂ†æöFR“°¢VÆVÖVçBç7G–ÆRæÆVgBÒG·‡×†°¢6öç7BÆ&VÅF÷ÒæöFRæg&vÖVçBÇÂæöFRæWf–FVæ6U6÷W&6P¢ò’²#€¢¢æöFRæ¶–æBÓÓÒ$ÄTå2 ¢ò’²#@¢¢æöFRæ–BÓÓÒ&6öæF—F–öâ ¢ò’²#P¢¢’ÒæöFRç6—¦R¢#bÒc°¢VÆVÖVçBç7G–ÆRçF÷ÒG¶Æ&VÅF÷×†°¢VÆVÖVçBæ6Æ74Æ—7BçFövvÆR‚&—2×f—6–&ÆR"Âf—6–&ÆR“°¢7FFRç&ö¦V7FVBç6WB†æöFRæ–BÂ°¢‚À¢’À¢&F—W3¢ÖF‚æÖ‚ƒ#ÂæöFRç6—¦R¢C"’À¢FWFƒ¢6Æ—³5ÒÀ¢7F—fS ¢æöFRç7FvRÃÒ7FFRçF–ÖVÆ–æU7FvRb`¢‚æöFRæWf–FVæ6U6÷W&6RÇÂ7FFRæWf–FVæ6Uf—6–&ÆR¢Ò“°¢Ğ¢&Vg&W6…&÷WFT6Æ76W2‚“°¢Ğ ¢gVæ7F–öâWFFTwV–FTÆ&VÇ2‡f–Wu&ö¦V7F–öâ’°¢6öç7Bv–GF‚Ò6çf2æ6Æ–VçEv–GFƒ°¢6öç7B†V–v‡BÒ6çf2æ6Æ–VçD†V–v‡C°¢f÷"†6öç7BwV–FRöbFFæwV–FW2óòµÒ’°¢6öç7BVÆVÖVçBÒwV–FTÆ&VÄVÆVÖVçG2ævWB†wV–FRæ–B“°¢6öç7B6Æ—ÒG&ç6f÷&Õö–çB‡f–Wu&ö¦V7F–öâÂwV–FRæÆ&VÅ÷6—F–öâ“°¢–b‚VÆVÖVçBÇÂ6Æ—³5ÒÃÒã’°¢VÆVÖVçCòæ6Æ74Æ—7Bç&VÖ÷fR‚&—2×f—6–&ÆR"“°¢6öçF–çVS°¢Ğ¢6öç7Bæ÷&ÖÆ—¦VE‚Ò6Æ—³Òò6Æ—³5Ó°¢6öç7Bæ÷&ÖÆ—¦VE’Ò6Æ—³Òò6Æ—³5Ó°¢6öç7Böå67&VVâĞ¢æ÷&ÖÆ—¦VE‚âÓã‚b`¢æ÷&ÖÆ—¦VE‚Âã‚b`¢æ÷&ÖÆ—¦VE’âÓãb`¢æ÷&ÖÆ—¦VE’Âã°¢VÆVÖVçBç7G–ÆRæÆVgBÒG²†æ÷&ÖÆ—¦VE‚¢ãR²ãR’¢v–GF‡×†°¢VÆVÖVçBç7G–ÆRçF÷ÒG²‚Öæ÷&ÖÆ—¦VE’¢ãR²ãR’¢†V–v‡G×†°¢VÆVÖVçBæ6Æ74Æ—7BçFövvÆR‚&—2×f—6–&ÆR"Âöå67&VVâ“°¢Ğ¢Ğ ¢gVæ7F–öâWFFUF–ÖTÆ&VÇ2‡f–Wu&ö¦V7F–öâ’°¢6öç7Bv–GF‚Ò6çf2æ6Æ–VçEv–GFƒ°¢6öç7B†V–v‡BÒ6çf2æ6Æ–VçD†V–v‡C°¢f÷"†6öç7BÖ&¶W"öbFFçF–ÖTÖ&¶W'2óòµÒ’°¢6öç7BVÆVÖVçBÒF–ÖTÆ&VÄVÆVÖVçG2ævWB†Ö&¶W"ç7FvR“°¢6öç7B6Æ—ÒG&ç6f÷&Õö–çB‡f–Wu&ö¦V7F–öâÂÖ&¶W"ç÷6—F–öâ“°¢–b‚VÆVÖVçBÇÂ6Æ—³5ÒÃÒã’°¢VÆVÖVçCòæ6Æ74Æ—7Bç&VÖ÷fR‚&—2×f—6–&ÆR"“°¢6öçF–çVS°¢Ğ¢6öç7Bæ÷&ÖÆ—¦VE‚Ò6Æ—³Òò6Æ—³5Ó°¢6öç7Bæ÷&ÖÆ—¦VE’Ò6Æ—³Òò6Æ—³5Ó°¢6öç7Böå67&VVâĞ¢æ÷&ÖÆ—¦VE‚âÓã"b`¢æ÷&ÖÆ—¦VE‚Âã"b`¢æ÷&ÖÆ—¦VE’âÓãRb`¢æ÷&ÖÆ—¦VE’ÂãS°¢VÆVÖVçBç7G–ÆRæÆVgBÒG²†æ÷&ÖÆ—¦VE‚¢ãR²ãR’¢v–GF‡×†°¢VÆVÖVçBç7G–ÆRçF÷ÒG²‚Öæ÷&ÖÆ—¦VE’¢ãR²ãR’¢†V–v‡B²G×†°¢VÆVÖVçBæ6Æ74Æ—7BçFövvÆR€¢&—2×f—6–&ÆR"À¢öå67&VVâbbÖ&¶W"ç7FvRÃÒ7FFRçF–ÖVÆ–æU7FvP¢“°¢VÆVÖVçBæ6Æ74Æ—7BçFövvÆR‚&—2Ö–ÆÇW7G&F—fR"ÂÖ&¶W"æ¶æ÷vâ“°¢Ğ¢Ğ ¢gVæ7F–öâ&W6—¦T6çf2‚’°¢6öç7B—†VÅ&F–òÒÖF‚æÖ–â‡v–æF÷ræFWf–6U—†VÅ&F–òÇÂÂ"“°¢6öç7Bv–GF‚ÒÖF‚æÖ‚ƒÂÖF‚æfÆö÷"†6çf2æ6Æ–VçEv–GF‚¢—†VÅ&F–ò’“°¢6öç7B†V–v‡BÒÖF‚æÖ‚ƒÂÖF‚æfÆö÷"†6çf2æ6Æ–VçD†V–v‡B¢—†VÅ&F–ò’“°¢–b†6çf2çv–GF‚ÓÒv–GF‚ÇÂ6çf2æ†V–v‡BÓÒ†V–v‡B’°¢6çf2çv–GF‚Òv–GFƒ°¢6çf2æ†V–v‡BÒ†V–v‡C°¢Ğ¢vÂçf–Ww÷'BƒÂÂv–GF‚Â†V–v‡B“°¢&WGW&â—†VÅ&F–ó°¢Ğ ¢gVæ7F–öâ6ÖW&÷6—F–öâ‚’°¢6öç7B6ÖW&Ò7FFRæ6ÖW&°¢6öç7B†÷&—¦öçFÂÒÖF‚æ6÷2†6ÖW&ç—F6‚’¢6ÖW&æF—7Fæ6S°¢&WGW&â°¢6ÖW&çF&vWE³Ò²ÖF‚ç6–â†6ÖW&ç–r’¢†÷&—¦öçFÂÀ¢6ÖW&çF&vWE³Ò²ÖF‚ç6–â†6ÖW&ç—F6‚’¢6ÖW&æF—7Fæ6RÀ¢6ÖW&çF&vWE³%Ò²ÖF‚æ6÷2†6ÖW&ç–r’¢†÷&—¦öçFÀ¢Ó°¢Ğ ¢gVæ7F–öâ&VæFW"‡F–ÖR’°¢6öç7B—†VÅ&F–òÒ&W6—¦T6çf2‚“°¢f÷"†ÆWB–æFW‚Ò²–æFW‚Â3²–æFW‚³Ò’°¢7FFRæ6ÖW&çF&vWE¶–æFW…Ò³Ğ¢‡7FFRæ6ÖW&çF&vWDvöÅ¶–æFW…ÒÒ7FFRæ6ÖW&çF&vWE¶–æFW…Ò’¢‡&VGV6VDÖ÷F–öâò¢ãSR“°¢Ğ ¢6öç7BW–RÒ6ÖW&÷6—F–öâ‚“°¢6öç7B&ö¦V7F–öâÒW'7V7F—fTÖG&—‚€¢ÖF‚å’òBãÀ¢6çf2æ6Æ–VçEv–GF‚òÖF‚æÖ‚ƒÂ6çf2æ6Æ–VçD†V–v‡B’À¢ãÀ¢ƒ ¢“°¢6öç7Bf–WrÒÆöö´DÖG&—‚†W–RÂ7FFRæ6ÖW&çF&vWB“°¢6öç7Bf–Wu&ö¦V7F–öâÒ×VÇF—Ç”ÖG&–6W2‡&ö¦V7F–öâÂf–Wr“°¢6öç7B÷6—F–öç2ÒæWrÖ€¢FFææöFW2æÖ‚†æöFR’Óâ¶æöFRæ–BÂæöFTfÆöE÷6—F–öâ†æöFRÂF–ÖR•Ò¢“° ¢vÂæ6ÆV$6öÆ÷"ƒÂÂÂ“°¢vÂæ6ÆV"†vÂä4ôÄõ%ô%TddU%ô$•BÂvÂäDUD…ô%TddU%ô$•B“°¢vÂæVæ&ÆR†vÂä$ÄTäB“°¢vÂæ&ÆVæDgVæ2†vÂå5$5ôÅ„ÂvÂäôäUôÔ”åU5õ5$5ôÅ„“°¢vÂæVæ&ÆR†vÂäDUD…õDU5B“°¢vÂæFWF„gVæ2†vÂäÄUTÂ“° ¢&VæFW%'F–6ÆW2‡f–Wu&ö¦V7F–öâÂ—†VÅ&F–ò“°¢&VæFW$wV–FW2‡f–Wu&ö¦V7F–öâÂ÷6—F–öç2“°¢&VæFW$VFvW2‡f–Wu&ö¦V7F–öâÂ÷6—F–öç2ÂF–ÖR“°¢f÷"†6öç7BæöFRöbFFææöFW2’°¢&VæFW$æöFR†æöFRÂ÷6—F–öç2ævWB†æöFRæ–B’Âf–Wu&ö¦V7F–öâÂW–RÂF–ÖR“°¢Ğ¢WFFTÆ&VÇ2‡f–Wu&ö¦V7F–öâÂ÷6—F–öç2“°¢WFFTwV–FTÆ&VÇ2‡f–Wu&ö¦V7F–öâ“°¢WFFUF–ÖTÆ&VÇ2‡f–Wu&ö¦V7F–öâ“°¢v–æF÷rç&WVW7Dæ–ÖF–öäg&ÖR‡&VæFW"“°¢Ğ ¢gVæ7F–öâ–6´æöFR†6Æ–VçE‚Â6Æ–VçE’’°¢6öç7B&V7FævÆRÒ6çf2ævWD&÷VæF–æt6Æ–VçE&V7B‚“°¢6öç7B‚Ò6Æ–VçE‚Ò&V7FævÆRæÆVgC°¢6öç7B’Ò6Æ–VçE’Ò&V7FævÆRçF÷°¢ÆWBv–ææW"ÒçVÆÃ°¢ÆWB&W7E66÷&RÒçVÖ&W"åõ4•D•dUô”äd”ä•E“°¢f÷"†6öç7B¶æöFT–BÂ&ö¦V7FVEÒöb7FFRç&ö¦V7FVB’°¢–b‚&ö¦V7FVBæ7F—fR’6öçF–çVS°¢6öç7BF—7Fæ6RÒÖF‚æ‡—÷B‡&ö¦V7FVBç‚Ò‚Â&ö¦V7FVBç’Ò’“°¢–b†F—7Fæ6RÃÒ&ö¦V7FVBç&F—W2’°¢6öç7B66÷&RÒF—7Fæ6R²&ö¦V7FVBæFWF‚¢ãS°¢–b‡66÷&RÂ&W7E66÷&R’°¢&W7E66÷&RÒ66÷&S°¢v–ææW"ÒæöFT–C°¢Ğ¢Ğ¢Ğ¢&WGW&âv–ææW#°¢Ğ ¢6çf2æFDWfVçDÆ—7FVæW"‚'ö–çFW&F÷vâ"Â†WfVçB’Óâ°¢6çf2ç6WEö–çFW$6GW&R†WfVçBçö–çFW$–B“°¢7FFRçö–çFW"Ò°¢–C¢WfVçBçö–çFW$–BÀ¢7F'Eƒ¢WfVçBæ6Æ–VçE‚À¢7F'E“¢WfVçBæ6Æ–VçE’À¢&Wf–÷W5ƒ¢WfVçBæ6Æ–VçE‚À¢&Wf–÷W5“¢WfVçBæ6Æ–VçE’À¢Ö÷fVC¢fÇ6P¢Ó°¢6çf2æ6Æ74Æ—7BæFB‚&—2ÖG&vv–ær"“°¢Ò“° ¢6çf2æFDWfVçDÆ—7FVæW"‚'ö–çFW&Ö÷fR"Â†WfVçB’Óâ°¢–b‡7FFRçö–çFW#òæ–BÓÓÒWfVçBçö–çFW$–B’°¢6öç7BFVÇF‚ÒWfVçBæ6Æ–VçE‚Ò7FFRçö–çFW"ç&Wf–÷W5ƒ°¢6öç7BFVÇF’ÒWfVçBæ6Æ–VçE’Ò7FFRçö–çFW"ç&Wf–÷W5“°¢–b„ÖF‚æ‡—÷B†WfVçBæ6Æ–VçE‚Ò7FFRçö–çFW"ç7F'E‚ÂWfVçBæ6Æ–VçE’Ò7FFRçö–çFW"ç7F'E’’âR’°¢7FFRçö–çFW"æÖ÷fVBÒG'VS°¢Ğ¢–b‡7FFRçö–çFW"æÖ÷fVB’°¢7FFRæ6ÖW&ç–rÓÒFVÇF‚¢ãc°¢7FFRæ6ÖW&ç—F6‚ÒÖF‚æÖ‚‚ÓãS"ÂÖF‚æÖ–âƒãcbÂ7FFRæ6ÖW&ç—F6‚²FVÇF’¢ãR’“°¢Ğ¢7FFRçö–çFW"ç&Wf–÷W5‚ÒWfVçBæ6Æ–VçEƒ°¢7FFRçö–çFW"ç&Wf–÷W5’ÒWfVçBæ6Æ–VçE“°¢&WGW&ã°¢Ğ¢7FFRæ†÷fW&VBÒ–6´æöFR†WfVçBæ6Æ–VçE‚ÂWfVçBæ6Æ–VçE’“°¢Ò“° ¢gVæ7F–öâf–æ—6…ö–çFW"†WfVçB’°¢–b‚7FFRçö–çFW"ÇÂ7FFRçö–çFW"æ–BÓÒWfVçBçö–çFW$–B’&WGW&ã°¢–b‚7FFRçö–çFW"æÖ÷fVB’°¢6öç7B–6¶VBÒ–6´æöFR†WfVçBæ6Æ–VçE‚ÂWfVçBæ6Æ–VçE’“°¢–b‡–6¶VB’&VæFW$FWF–Â‡–6¶VB“°¢Ğ¢7FFRçö–çFW"ÒçVÆÃ°¢6çf2æ6Æ74Æ—7Bç&VÖ÷fR‚&—2ÖG&vv–ær"“°¢Ğ ¢6çf2æFDWfVçDÆ—7FVæW"‚'ö–çFW'W"Âf–æ—6…ö–çFW"“°¢6çf2æFDWfVçDÆ—7FVæW"‚'ö–çFW&6æ6VÂ"Âf–æ—6…ö–çFW"“°¢6çf2æFDWfVçDÆ—7FVæW"‚'ö–çFW&ÆVfR"Â‚’Óâ°¢–b‚7FFRçö–çFW"’7FFRæ†÷fW&VBÒçVÆÃ°¢Ò“°¢6çf2æFDWfVçDÆ—7FVæW"€¢'v†VVÂ"À¢†WfVçB’Óâ°¢WfVçBç&WfVçDFVfVÇB‚“°¢7FFRæ6ÖW&æF—7Fæ6RÒÖF‚æÖ‚ƒ‚ã"ÂÖF‚æÖ–âƒ#"Â7FFRæ6ÖW&æF—7Fæ6R²WfVçBæFVÇF’¢ã’’“°¢ÒÀ¢²76—fS¢fÇ6RĞ¢“° ¢WFFUF–ÖVÆ–æU&VF÷WB‚“°¢v–æF÷rç&WVW7Dæ–ÖF–öäg&ÖR‡&VæFW"“°§Ò’‚“°
