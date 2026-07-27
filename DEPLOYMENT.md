@@ -28,4 +28,3 @@ them with stable provenance descriptions.
 This static preview does not unlock hosted records, team access, identity,
 database, MCP/API, external AI, analytics, automatic capture, or external data
 collection.
-
