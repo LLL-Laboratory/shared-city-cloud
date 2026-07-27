@@ -43,4 +43,3 @@ hosted research storage.
 
 Deployment details and verification boundaries are recorded in
 [`DEPLOYMENT.md`](./DEPLOYMENT.md).
-
