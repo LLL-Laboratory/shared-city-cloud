@@ -3,18 +3,18 @@ window.SCC_DATA = {
   "schemaVersion": "2.0.0",
   "sourceAuthority": "Protected Shared Record Core snapshot; authority files are not part of this public preview",
   "sourceRecords": {
-    "contract": "Research contract v1.0 â€” authority retained outside this public preview",
-    "architecture": "Shared City architecture record â€” authority retained outside this public preview",
-    "condition": "Shared Record Core snapshot â€” SLC-0001 / version 0001",
-    "reviewAccept": "Shared Record Core review snapshot â€” SLC-0001 / CLM-01 ACCEPT",
-    "reviewHold": "Shared Record Core review snapshot â€” SLC-0001 / CLM-02 HOLD",
-    "food": "Shared Record Core snapshot â€” SLC-0001-FOOD-01 / version 0001",
-    "money": "Shared Record Core snapshot â€” SLC-0001-MONEY-01 / version 0001",
-    "sand": "Shared Record Core snapshot â€” SLC-0001-SAND-01 / version 0001",
-    "policy": "Conditional review policy snapshot â€” authority effect NONE",
-    "phases": "Build phases record â€” approved spatial direction",
-    "blueprint": "Phase 3 experience blueprint â€” approved spatial direction",
-    "continuity": "Continuity snapshot â€” publishable summary only"
+    "contract": "Research contract v1.0 — authority retained outside this public preview",
+    "architecture": "Shared City architecture record — authority retained outside this public preview",
+    "condition": "Shared Record Core snapshot — SLC-0001 / version 0001",
+    "reviewAccept": "Shared Record Core review snapshot — SLC-0001 / CLM-01 ACCEPT",
+    "reviewHold": "Shared Record Core review snapshot — SLC-0001 / CLM-02 HOLD",
+    "food": "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001",
+    "money": "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001",
+    "sand": "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001",
+    "policy": "Conditional review policy snapshot — authority effect NONE",
+    "phases": "Build phases record — approved spatial direction",
+    "blueprint": "Phase 3 experience blueprint — approved spatial direction",
+    "continuity": "Continuity snapshot — publishable summary only"
   },
   "recordSnapshot": {
     "conditionStatus": "DRAFT / FOR TEAM REVIEW",
@@ -64,8 +64,8 @@ window.SCC_DATA = {
       "region": "City Foundation",
       "hierarchy": 1,
       "sourceRefs": [
-        "Research contract v1.0 â€” authority retained outside this public preview",
-        "Shared City architecture record â€” authority retained outside this public preview"
+        "Research contract v1.0 — authority retained outside this public preview",
+        "Shared City architecture record — authority retained outside this public preview"
       ],
       "details": [
         "Food, Money, and Sand remain equal and separate.",
@@ -101,7 +101,7 @@ window.SCC_DATA = {
       "region": "Active Work Horizon",
       "hierarchy": 2,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001 / version 0001"
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
       ],
       "details": [
         "Roadway flooding and mobility disruption occurred around Iyana-Oworo / Olopomeji approaching Third Mainland Bridge on the morning of 3 July 2024.",
@@ -145,7 +145,7 @@ window.SCC_DATA = {
       "region": "Food Territory",
       "hierarchy": 2,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-FOOD-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001"
       ],
       "details": [
         "Separate Food Lens record for testing whether one identifiable food-moving journey can be linked to the bounded condition without presuming an impact.",
@@ -188,7 +188,7 @@ window.SCC_DATA = {
       "region": "Money Territory",
       "hierarchy": 2,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-MONEY-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001"
       ],
       "details": [
         "Separate Money Lens record for testing one preregistered incident-day money-flow field for one consenting case without manufacturing a general loss.",
@@ -231,7 +231,7 @@ window.SCC_DATA = {
       "region": "Sand Territory",
       "hierarchy": 2,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-SAND-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001"
       ],
       "details": [
         "Separate Sand Lens record for testing what the relevant field team contemporaneously recorded observing and doing without assigning an unsupported environmental cause.",
@@ -273,7 +273,7 @@ window.SCC_DATA = {
       "region": "Food Territory",
       "hierarchy": 3,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-FOOD-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001"
       ],
       "details": [
         "No source currently satisfies the Food request's case identity, food status, corridor-relation, outcome, and provenance requirements.",
@@ -315,7 +315,7 @@ window.SCC_DATA = {
       "region": "Money Territory",
       "hierarchy": 3,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-MONEY-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001"
       ],
       "details": [
         "No source currently satisfies exposure, preregistered money field, matched comparison, payer/receiver, consent, and provenance requirements.",
@@ -357,7 +357,7 @@ window.SCC_DATA = {
       "region": "Sand Territory",
       "hierarchy": 3,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-SAND-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001"
       ],
       "details": [
         "The public clearance account is insufficient without a located, timed, provenance-bearing field record whose expected scope and completeness are known.",
@@ -400,7 +400,7 @@ window.SCC_DATA = {
       "hierarchy": 4,
       "fragment": true,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-FOOD-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001"
       ],
       "details": [
         "This abstract plate is an original interface thumbnail of source provenance.",
@@ -443,7 +443,7 @@ window.SCC_DATA = {
       "hierarchy": 4,
       "fragment": true,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-MONEY-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001"
       ],
       "details": [
         "This abstract plate is an original interface thumbnail of source provenance.",
@@ -486,7 +486,7 @@ window.SCC_DATA = {
       "hierarchy": 4,
       "fragment": true,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001-SAND-01 / version 0001"
+        "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001"
       ],
       "details": [
         "This abstract plate is an original interface thumbnail of source provenance.",
@@ -525,8 +525,8 @@ window.SCC_DATA = {
       "region": "Active Work Horizon",
       "hierarchy": 3,
       "sourceRefs": [
-        "Shared Record Core review snapshot â€” SLC-0001 / CLM-01 ACCEPT",
-        "Shared Record Core review snapshot â€” SLC-0001 / CLM-02 HOLD"
+        "Shared Record Core review snapshot — SLC-0001 / CLM-01 ACCEPT",
+        "Shared Record Core review snapshot — SLC-0001 / CLM-02 HOLD"
       ],
       "details": [
         "ACCEPT: Accept only the narrow roadway-inundation and mobility-disruption claim at the stated corridor and morning scope. This does not approve the whole record or promote shared memory.",
@@ -564,8 +564,8 @@ window.SCC_DATA = {
       "region": "Methods & Handoffs",
       "hierarchy": 3,
       "sourceRefs": [
-        "Build phases record â€” approved spatial direction",
-        "Phase 3 experience blueprint â€” approved spatial direction"
+        "Build phases record — approved spatial direction",
+        "Phase 3 experience blueprint — approved spatial direction"
       ],
       "details": [
         "This object demonstrates the approved spatial place only.",
@@ -602,8 +602,64 @@ window.SCC_DATA = {
       "region": "Active Work Horizon",
       "hierarchy": 3,
       "sourceRefs": [
-        "Continuity snapshot â€” publishable summary only"
-      ],…736 tokens truncated…0.26,
+        "Continuity snapshot — publishable summary only"
+      ],
+      "details": [
+        "The route highlights existing snapshot objects; it does not generate context or contact an AI.",
+        "The same route is available in the non-3D Navigator."
+      ]
+    },
+    {
+      "id": "thoughts",
+      "kind": "EXPLORATORY CONSTELLATION",
+      "title": "What needs thought?",
+      "short": "Questions, holds, proposals, and unknowns that must remain unresolved.",
+      "label": "PROPOSAL",
+      "status": "UNRESOLVED CLUSTER",
+      "effect": "NO FACT PROMOTION",
+      "position": [
+        4.55,
+        0.35,
+        -1.35
+      ],
+      "size": 0.2,
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "sphere",
+      "stage": 1,
+      "primary": false,
+      "quietDuringPulse": true,
+      "region": "What Needs Thought?",
+      "hierarchy": 3,
+      "sourceRefs": [
+        "Shared Record Core snapshot — SLC-0001 / version 0001",
+        "Conditional review policy snapshot — authority effect NONE"
+      ],
+      "details": [
+        "Quiet objects do not light up as supported impacts during City Pulse.",
+        "Selecting this cluster reveals each unresolved item with its exact label."
+      ]
+    },
+    {
+      "id": "thought-boundary",
+      "title": "Exact corridor boundary",
+      "label": "ASSUMPTION",
+      "status": "HOLD",
+      "statement": "The general corridor is used as a working retrieval envelope; it is not established as one exact shared place boundary.",
+      "position": [
+        4.15,
+        1.15,
+        -1.05
+      ],
+      "kind": "UNRESOLVED ITEM",
+      "short": "The general corridor is used as a working retrieval envelope; it is not established as one exact shared place boundary.",
+      "effect": "NONE",
+      "size": 0.11,
+      "color": [
+        0.26,
         0.27,
         0.28
       ],
@@ -614,7 +670,41 @@ window.SCC_DATA = {
       "region": "What Needs Thought?",
       "hierarchy": 4,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001 / version 0001"
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
+      ],
+      "details": [
+        "The general corridor is used as a working retrieval envelope; it is not established as one exact shared place boundary.",
+        "This item is deliberately not rendered as a fact."
+      ]
+    },
+    {
+      "id": "thought-causes",
+      "title": "Cause and contribution",
+      "label": "HYPOTHESIS",
+      "status": "HOLD",
+      "statement": "Rainfall, lagoon level, drainage, the reported BRT incident, intervention, and natural recession remain competing or unresolved explanations.",
+      "position": [
+        5.25,
+        0.95,
+        -2.1
+      ],
+      "kind": "UNRESOLVED ITEM",
+      "short": "Rainfall, lagoon level, drainage, the reported BRT incident, intervention, and natural recession remain competing or unresolved explanations.",
+      "effect": "NONE",
+      "size": 0.11,
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "sphere",
+      "stage": 1,
+      "thought": true,
+      "quietDuringPulse": true,
+      "region": "What Needs Thought?",
+      "hierarchy": 4,
+      "sourceRefs": [
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
       ],
       "details": [
         "Rainfall, lagoon level, drainage, the reported BRT incident, intervention, and natural recession remain competing or unresolved explanations.",
@@ -648,7 +738,7 @@ window.SCC_DATA = {
       "region": "What Needs Thought?",
       "hierarchy": 4,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001 / version 0001"
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
       ],
       "details": [
         "No food journey, delivery, market, commodity, household-access, price, or loss outcome is currently linked to this condition with minimally sufficient evidence.",
@@ -682,7 +772,7 @@ window.SCC_DATA = {
       "region": "What Needs Thought?",
       "hierarchy": 4,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001 / version 0001"
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
       ],
       "details": [
         "No fare, fuel, wage, receipt, sales, damage, emergency spending, borrowing, or other money-flow outcome is currently linked to this condition for a defined consenting case.",
@@ -716,7 +806,7 @@ window.SCC_DATA = {
       "region": "What Needs Thought?",
       "hierarchy": 4,
       "sourceRefs": [
-        "Shared Record Core snapshot â€” SLC-0001 / version 0001"
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
       ],
       "details": [
         "No complete field record currently establishes what EFAG observed or did at the bounded corridor and time, and no environmental cause or intervention effect can be estimated.",
@@ -750,7 +840,7 @@ window.SCC_DATA = {
       "region": "What Needs Thought?",
       "hierarchy": 4,
       "sourceRefs": [
-        "Conditional review policy snapshot â€” authority effect NONE"
+        "Conditional review policy snapshot — authority effect NONE"
       ],
       "details": [
         "Meeting a threshold changes only local workflow state. It does not establish real authority, change a record, update shared memory, or prove a claim true.",
@@ -1052,7 +1142,7 @@ window.SCC_DATA = {
     {
       "id": "active-work-horizon",
       "kind": "route",
-      "title": "ACTIVE WORK / DRAFT Â· REVIEW Â· HANDOFF",
+      "title": "ACTIVE WORK / DRAFT · REVIEW · HANDOFF",
       "labelPosition": [
         -4.9,
         0,
@@ -1207,19 +1297,19 @@ window.SCC_DATA = {
     },
     {
       "stage": 1,
-      "display": "25 Jul 2026 Â· draft",
+      "display": "25 Jul 2026 · draft",
       "accuracy": "KNOWN DATE; SPATIAL ARRANGEMENT ILLUSTRATIVE",
       "note": "SLC-0001 was structured as a draft for team review. The general corridor remained a working envelope."
     },
     {
       "stage": 2,
-      "display": "25 Jul 2026 Â· claim review",
+      "display": "25 Jul 2026 · claim review",
       "accuracy": "KNOWN DATE AND IMMUTABLE SEQUENCE; NO PRECISE REVIEW TIME",
       "note": "CLM-01 was accepted at narrow scope and CLM-02 was held. The record itself remained draft."
     },
     {
       "stage": 3,
-      "display": "26 Jul 2026 Â· local core",
+      "display": "26 Jul 2026 · local core",
       "accuracy": "KNOWN LOCAL RECORD TIMESTAMP",
       "note": "Four immutable version-one records were represented locally with two imported claim-review decisions."
     },
@@ -1227,7 +1317,7 @@ window.SCC_DATA = {
       "stage": 4,
       "display": "Spatial demo",
       "accuracy": "ILLUSTRATIVE POSITIONING ONLY",
-      "note": "Skills, handoffs, distance, orbit, and animation demonstrate interaction designâ€”not event time or analytics."
+      "note": "Skills, handoffs, distance, orbit, and animation demonstrate interaction design—not event time or analytics."
     }
   ],
   "pathReplay": [
@@ -1255,7 +1345,7 @@ window.SCC_DATA = {
       ],
       "date": "25 Jul 2026",
       "label": "EVIDENCE",
-      "state": "CLM-01 Â· ACCEPT",
+      "state": "CLM-01 · ACCEPT",
       "note": "Claim-level acceptance only. It does not approve the whole record."
     },
     {
@@ -1265,7 +1355,7 @@ window.SCC_DATA = {
       ],
       "date": "25 Jul 2026",
       "label": "ASSUMPTION",
-      "state": "CLM-02 Â· HOLD",
+      "state": "CLM-02 · HOLD",
       "note": "The general corridor remains a working retrieval envelope, not an exact boundary."
     },
     {
@@ -1333,4 +1423,3 @@ window.SCC_DATA = {
     "navigatorParity": "SAME NODES, RELATIONSHIPS, LABELS, STATUSES, AND DETAIL SURFACE"
   }
 };
-
