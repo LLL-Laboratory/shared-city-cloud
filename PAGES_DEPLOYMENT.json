@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "hostingProvider": "GITHUB PAGES ONLY",
+  "deploymentStatus": "PUBLISHABLE STATIC ARTIFACT",
+  "repository": "LLL-Laboratory/shared-city-cloud",
+  "repositoryVisibility": "PUBLIC",
+  "pagesSource": {
+    "branch": "main",
+    "path": "/"
+  },
+  "pagesUrl": "https://lll-laboratory.github.io/shared-city-cloud/",
+  "basePathCompatible": true,
+  "entrypoint": "index.html",
+  "runtimeFiles": [
+    "index.html",
+    "styles.css",
+    "atlas.css",
+    "app.js",
+    "data.generated.js"
+  ],
+  "researchConstraints": {
+    "conditionStatus": "DRAFT / FOR TEAM REVIEW",
+    "sharedMemoryEffect": "NONE",
+    "lensStanding": "FOOD / MONEY / SAND EQUAL AND SEPARATE",
+    "lensAnswer": "UNKNOWN / NOT ESTIMABLE"
+  },
+  "exclusions": [
+    "NO EXTERNAL DATA COLLECTION",
+    "NO EXTERNAL AI OR MCP/API",
+    "NO IDENTITY OR DATABASE",
+    "NO CLAIM OF REAL ANALYTICS"
+  ]
+}
+
