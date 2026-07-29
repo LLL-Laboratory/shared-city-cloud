@@ -1,6 +1,6 @@
 /* Generated from protected local research authority inputs. */
 window.SCC_DATA = {
-  "schemaVersion": "2.2.0",
+  "schemaVersion": "2.3.0",
   "sourceAuthority": "Protected local Shared Record Core, incident-register, and evidence-brief snapshots; authority files are not part of this public preview",
   "sourceRecords": {
     "incidentRegister": "SLC-0001 incident evidence register - INC-00 to INC-07 and INC-TIME-01",
@@ -1704,6 +1704,469 @@ window.SCC_DATA = {
         "Needed next: Team approval or amendment of reviewer identities, thresholds, decision scope, and governance effect.",
         "This item is deliberately not rendered as a fact."
       ]
+    },
+    {
+      "id": "memory-occurrence",
+      "track": "RESEARCH HISTORY",
+      "title": "03 Jul 2024 / bounded occurrence",
+      "label": "EVIDENCE",
+      "status": "BOUNDED OCCURRENCE / RECORD STILL DRAFT",
+      "date": "03 Jul 2024",
+      "dateAccuracy": "KNOWN DATE / MORNING SCOPE ONLY",
+      "stage": 0,
+      "position": [
+        -6.2,
+        -1.62,
+        -3.92
+      ],
+      "sourceNodeIds": [
+        "condition"
+      ],
+      "sourceRefs": [
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
+      ],
+      "short": "A quiet reference to the supported corridor-and-morning occurrence, not to a settled cause or lens impact.",
+      "details": [
+        "Supports roadway inundation and mobility disruption only at the bounded corridor-and-morning scope.",
+        "Exact boundary, duration, causes, and Food, Money, and Sand impacts remain unresolved.",
+        "Historical placement does not increase evidentiary weight or approve the record."
+      ],
+      "kind": "RESEARCH HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-review-draft",
+      "track": "RESEARCH HISTORY",
+      "title": "25 Jul 2026 / review draft",
+      "label": "PROPOSAL",
+      "status": "DRAFT / FOR TEAM REVIEW",
+      "date": "25 Jul 2026",
+      "dateAccuracy": "KNOWN DATE / SPATIAL RECESSION ILLUSTRATIVE",
+      "stage": 1,
+      "position": [
+        -5.05,
+        -0.96,
+        -4.48
+      ],
+      "sourceNodeIds": [
+        "condition"
+      ],
+      "sourceRefs": [
+        "Shared Record Core snapshot — SLC-0001 / version 0001"
+      ],
+      "short": "The public timeline representation of SLC-0001 being structured for review.",
+      "details": [
+        "This is a historical timeline representation, not a previous immutable record version.",
+        "SLC-0001 remains DRAFT / FOR TEAM REVIEW with shared-memory effect NONE.",
+        "No hidden version zero or earlier approved record is implied."
+      ],
+      "kind": "RESEARCH HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-clm-01",
+      "track": "RESEARCH HISTORY",
+      "title": "CLM-01 / narrow acceptance",
+      "label": "EVIDENCE",
+      "status": "ACCEPT / CLAIM LEVEL ONLY",
+      "date": "25 Jul 2026",
+      "dateAccuracy": "KNOWN DATE AND SEQUENCE / PRECISE REVIEW TIME UNKNOWN",
+      "stage": 2,
+      "position": [
+        -3.7,
+        -0.42,
+        -4.92
+      ],
+      "sourceNodeIds": [
+        "review"
+      ],
+      "sourceRefs": [
+        "Shared Record Core review snapshot — SLC-0001 / CLM-01 ACCEPT"
+      ],
+      "short": "The immutable ACCEPT decision at narrow roadway-inundation and mobility-disruption scope.",
+      "details": [
+        "CLM-01 ACCEPT is claim-level only and has record effect NONE.",
+        "It does not approve SLC-0001, settle cause, establish a lens impact, or promote shared memory.",
+        "The whole record remains DRAFT / FOR TEAM REVIEW."
+      ],
+      "kind": "RESEARCH HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-clm-02",
+      "track": "RESEARCH HISTORY",
+      "title": "CLM-02 / boundary hold",
+      "label": "ASSUMPTION",
+      "status": "HOLD",
+      "date": "25 Jul 2026",
+      "dateAccuracy": "KNOWN DATE AND SEQUENCE / PRECISE REVIEW TIME UNKNOWN",
+      "stage": 2,
+      "position": [
+        -2.12,
+        -0.62,
+        -5.18
+      ],
+      "sourceNodeIds": [
+        "thought-boundary"
+      ],
+      "sourceRefs": [
+        "Shared Record Core review snapshot — SLC-0001 / CLM-02 HOLD"
+      ],
+      "short": "The immutable HOLD decision preserving the corridor as a working retrieval envelope.",
+      "details": [
+        "CLM-02 remains HOLD with record effect NONE.",
+        "The general corridor is not an adopted exact flood boundary.",
+        "Placement in the garden does not resolve or retire the held assumption."
+      ],
+      "kind": "RESEARCH HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-core-v1",
+      "track": "RESEARCH HISTORY",
+      "title": "26 Jul 2026 / version-one set",
+      "label": "PROPOSAL",
+      "status": "VERSION ONE / DRAFT / FOR TEAM REVIEW",
+      "date": "26 Jul 2026",
+      "dateAccuracy": "KNOWN LOCAL RECORD TIMESTAMP",
+      "stage": 3,
+      "position": [
+        -0.48,
+        -1.12,
+        -5.34
+      ],
+      "sourceNodeIds": [
+        "condition",
+        "record-food",
+        "record-money",
+        "record-sand"
+      ],
+      "sourceRefs": [
+        "Shared Record Core snapshot — SLC-0001 / version 0001",
+        "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001",
+        "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001",
+        "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001"
+      ],
+      "short": "The first and only immutable version of the condition and three equal lens records.",
+      "details": [
+        "These are the first and only immutable versions: all four local records are version one and none has a predecessor version.",
+        "Food, Money, and Sand remain equal and separate, and each answer remains UNKNOWN / NOT ESTIMABLE.",
+        "The version-one set remains DRAFT / FOR TEAM REVIEW with effect NONE."
+      ],
+      "kind": "RESEARCH HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-continuity",
+      "track": "PROJECT HISTORY",
+      "title": "26 Jul 2026 / continuity marker",
+      "label": "PROPOSAL",
+      "status": "HISTORICAL CHECKPOINT REPRESENTATION",
+      "date": "26 Jul 2026",
+      "dateAccuracy": "KNOWN CHECKPOINT DATE / ABSTRACTED PUBLIC SUMMARY",
+      "stage": 4,
+      "position": [
+        1.5,
+        -1.08,
+        -5.26
+      ],
+      "sourceNodeIds": [
+        "handoff"
+      ],
+      "sourceRefs": [
+        "Continuity snapshot — publishable summary only"
+      ],
+      "short": "A bounded marker showing that a read-only continuity route exists without publishing its private source.",
+      "details": [
+        "This represents orientation history only; it is not an actual handover, authority listing, or private record.",
+        "The approved Guided Handover interaction remains a read-only route. That approval does not apply to research truth.",
+        "No checkpoint text, local path, private source, or task activation is present."
+      ],
+      "kind": "PROJECT HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-publish-lineage",
+      "track": "PROJECT HISTORY",
+      "title": "27 Jul 2026 / preview lineage",
+      "label": "PROPOSAL",
+      "status": "PUBLIC STATIC PREVIEW HISTORY / FOR REVIEW",
+      "date": "27 Jul 2026",
+      "dateAccuracy": "KNOWN CHECKPOINT DATE / TIMES OMITTED",
+      "stage": 4,
+      "position": [
+        3.45,
+        -0.66,
+        -4.82
+      ],
+      "sourceNodeIds": [
+        "handoff"
+      ],
+      "sourceRefs": [
+        "Continuity snapshot — publishable summary only"
+      ],
+      "short": "An abstract lineage of bounded public preview states, never research evidence or production approval.",
+      "details": [
+        "The lineage represents static preview, research-utility preview, and Scenario Chamber preview checkpoints.",
+        "Deployment history establishes review access and implementation continuity only.",
+        "It does not establish evidence, research approval, production readiness, or shared-memory promotion."
+      ],
+      "kind": "PROJECT HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+    },
+    {
+      "id": "memory-retired-baselines",
+      "track": "PROJECT HISTORY",
+      "title": "Retired interface baselines",
+      "label": "PROPOSAL",
+      "status": "SUPERSEDED / NOT CURRENT",
+      "date": "Before and on 27 Jul 2026",
+      "dateAccuracy": "SEQUENCE KNOWN / PRECISE TIMES NOT ESTABLISHED",
+      "stage": 4,
+      "position": [
+        5.62,
+        -1.3,
+        -4.08
+      ],
+      "sourceNodeIds": [
+        "foundation"
+      ],
+      "sourceRefs": [
+        "Build phases record — approved spatial direction",
+        "Phase 3 experience blueprint — approved spatial direction"
+      ],
+      "short": "Abstract decision-history markers for interface directions that are not current and are not reused here.",
+      "details": [
+        "One prior page-style direction is REJECTED AS A VISUAL / INTERACTION BASELINE.",
+        "One first spatial material state is REJECTED AS A VISUAL QUALITY STATE.",
+        "Only abstract status markers remain. No old code, layout, assets, scene grammar, or content is published or reused."
+      ],
+      "kind": "PROJECT HISTORY REPRESENTATION",
+      "effect": "NONE",
+      "size": 0.17,
+      "scale": [
+        1.35,
+        0.1,
+        0.56
+      ],
+      "color": [
+        0.26,
+        0.27,
+        0.28
+      ],
+      "shape": "plate",
+      "primary": false,
+      "stable": true,
+      "material": "memory",
+      "region": "Memory Garden",
+      "hierarchy": 4,
+      "memoryGarden": true,
+      "temporalState": "HISTORICAL",
+      "representationOnly": true,
+      "navigationOnly": true,
+      "currentTask": false,
+      "taskActivation": false,
+      "researchPromotion": false,
+      "sharedMemoryPromotion": false,
+      "quietDuringPulse": true,
+      "claimedPreviousVersion": false,
+      "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
     }
   ],
   "edges": [
@@ -2198,6 +2661,105 @@ window.SCC_DATA = {
       "label": "PROPOSAL",
       "quiet": true,
       "dashed": true
+    },
+    {
+      "from": "memory-occurrence",
+      "to": "condition",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-review-draft",
+      "to": "condition",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-clm-01",
+      "to": "review",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-clm-02",
+      "to": "thought-boundary",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-core-v1",
+      "to": "condition",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-core-v1",
+      "to": "record-food",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-core-v1",
+      "to": "record-money",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-core-v1",
+      "to": "record-sand",
+      "kind": "history-reference",
+      "relationshipType": "HISTORY REFERENCE",
+      "label": "Navigational reference to current bounded representation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-continuity",
+      "to": "handoff",
+      "kind": "implementation-continuity",
+      "relationshipType": "IMPLEMENTATION CONTINUITY",
+      "label": "Navigational reference to current project orientation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-publish-lineage",
+      "to": "handoff",
+      "kind": "implementation-continuity",
+      "relationshipType": "IMPLEMENTATION CONTINUITY",
+      "label": "Navigational reference to current project orientation",
+      "quiet": true,
+      "representationOnly": true
+    },
+    {
+      "from": "memory-retired-baselines",
+      "to": "foundation",
+      "kind": "implementation-continuity",
+      "relationshipType": "IMPLEMENTATION CONTINUITY",
+      "label": "Navigational reference to current project orientation",
+      "quiet": true,
+      "representationOnly": true
     }
   ],
   "guides": [
@@ -2309,6 +2871,33 @@ window.SCC_DATA = {
       ],
       "alpha": 0.1,
       "showLabel": true
+    },
+    {
+      "id": "memory-garden-field",
+      "kind": "memory",
+      "title": "MEMORY GARDEN / HISTORY ONLY / NO PROMOTION",
+      "labelPosition": [
+        0,
+        -0.2,
+        -5.48
+      ],
+      "nodeIds": [
+        "memory-occurrence",
+        "memory-review-draft",
+        "memory-clm-01",
+        "memory-clm-02",
+        "memory-core-v1",
+        "memory-continuity",
+        "memory-publish-lineage",
+        "memory-retired-baselines"
+      ],
+      "color": [
+        0.58,
+        0.58,
+        0.54
+      ],
+      "alpha": 0.055,
+      "showLabel": true
     }
   ],
   "timeMarkers": [
@@ -2370,7 +2959,9 @@ window.SCC_DATA = {
     "EQUAL STANDING": "Equal lens status without conclusion transfer",
     "RECORD / PROVENANCE": "Immutable record connected to its source provenance snapshot",
     "ACTIVE WORK ROUTE": "Current condition, review, and handoff route",
-    "UNRESOLVED": "Held, unknown, proposed, or otherwise non-fact relationship"
+    "UNRESOLVED": "Held, unknown, proposed, or otherwise non-fact relationship",
+    "HISTORY REFERENCE": "Navigational reference from bounded research history to its current representation; never added evidence",
+    "IMPLEMENTATION CONTINUITY": "Navigational reference between abstract project-history markers and the current interface; never research approval"
   },
   "timeline": [
     {
@@ -2927,6 +3518,78 @@ window.SCC_DATA = {
       }
     ]
   },
+  "memoryGarden": {
+    "id": "memory-garden",
+    "title": "Memory Garden / quiet history",
+    "label": "PROPOSAL",
+    "status": "READ-ONLY HISTORY NAVIGATION",
+    "effect": "NONE",
+    "itemNodeIds": [
+      "memory-occurrence",
+      "memory-review-draft",
+      "memory-clm-01",
+      "memory-clm-02",
+      "memory-core-v1",
+      "memory-continuity",
+      "memory-publish-lineage",
+      "memory-retired-baselines"
+    ],
+    "researchTrackNodeIds": [
+      "memory-occurrence",
+      "memory-review-draft",
+      "memory-clm-01",
+      "memory-clm-02",
+      "memory-core-v1"
+    ],
+    "projectTrackNodeIds": [
+      "memory-continuity",
+      "memory-publish-lineage",
+      "memory-retired-baselines"
+    ],
+    "currentReferenceNodeIds": [
+      "foundation",
+      "condition",
+      "review",
+      "thought-boundary",
+      "record-food",
+      "record-money",
+      "record-sand",
+      "handoff"
+    ],
+    "currentReference": {
+      "conditionStatus": "DRAFT / FOR TEAM REVIEW",
+      "sharedMemoryEffect": "NONE",
+      "recordVersion": 1,
+      "previousRecordVersion": "NONE",
+      "lensStanding": "FOOD / MONEY / SAND EQUAL AND SEPARATE",
+      "lensAnswers": {
+        "Food": "UNKNOWN / NOT ESTIMABLE",
+        "Money": "UNKNOWN / NOT ESTIMABLE",
+        "Sand": "UNKNOWN / NOT ESTIMABLE"
+      },
+      "reviewDecisions": [
+        {
+          "claimId": "CLM-01",
+          "decision": "ACCEPT",
+          "recordEffect": "NONE"
+        },
+        {
+          "claimId": "CLM-02",
+          "decision": "HOLD",
+          "recordEffect": "NONE"
+        }
+      ],
+      "policyStatus": "CONDITIONAL / NOT TEAM-APPROVED"
+    },
+    "visibilityRule": "OBJECTS REMAIN SELECTABLE; LABELS AND ROUTES STRENGTHEN ONLY ON REQUEST",
+    "placementRule": "DISTANCE AND RECESSION ORIENT HISTORY ONLY; THEY DO NOT MEASURE AGE, VALUE, EVIDENCE, APPROVAL, OR PRIORITY",
+    "navigationOnly": true,
+    "representationOnly": true,
+    "researchPromotion": false,
+    "taskActivation": false,
+    "sharedMemoryPromotion": false,
+    "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
+  },
   "interactionClaims": {
     "cityPulse": "INTERACTION DEMONSTRATION ONLY",
     "timeSlider": "KNOWN TIMESTAMPS SEPARATED FROM ILLUSTRATIVE POSITIONING",
@@ -2936,6 +3599,7 @@ window.SCC_DATA = {
     "openQuestions": "HOLD, UNKNOWN, AND PROPOSED REQUESTS REMAIN NON-OUTCOMES",
     "conflictView": "OFFICIAL ACCOUNTS AND COMPETING PATHWAYS COMPARED WITHOUT SETTLING CAUSE",
     "scenarioChamber": "THREE EQUAL READ-ONLY LENS PATHWAYS; NO RUN, PREDICTION, CAUSAL RESULT, OR CROSS-LENS SYNTHESIS",
+    "memoryGarden": "QUIET READ-ONLY HISTORY NAVIGATION; NO EVIDENCE, APPROVAL, TASK, OR SHARED-MEMORY PROMOTION",
     "guidedHandover": "READ-ONLY OPTIONAL ROUTE; NON-3D EQUIVALENT PROVIDED",
     "spatialGrammar": "GROUNDED RECORD FIELD; MIDDLE ACTIVE WORK; EQUAL LENS CANOPY; CENTRAL CITY DATUM",
     "materialSystem": "NEAR-BLACK ATLAS; NEUTRAL MATERIALS; MUTED MEANINGFUL ACCENTS",

@@ -142,6 +142,12 @@ summary:focus-visible,
   transform: none;
 }
 
+.round-action[aria-pressed="true"] {
+  background: rgba(19, 22, 23, 0.9);
+  border-color: rgba(141, 139, 130, 0.56);
+  color: var(--atlas-ink);
+}
+
 .round-action {
   flex-direction: row;
   font-size: 8px;
@@ -227,6 +233,11 @@ summary:focus-visible,
   color: rgba(215, 213, 205, 0.52);
 }
 
+.world-guide-label[data-kind="memory"] {
+  color: rgba(154, 153, 146, 0.36);
+  letter-spacing: 0.2em;
+}
+
 .time-field-label {
   color: rgba(205, 203, 195, 0.46);
   letter-spacing: 0.11em;
@@ -296,6 +307,17 @@ summary:focus-visible,
   color: rgba(198, 197, 190, 0.66);
   font-size: 7px;
   letter-spacing: 0.1em;
+}
+
+.cloud-label[data-memory="true"] span {
+  color: rgba(178, 177, 169, 0.54);
+  font-size: 6px;
+  letter-spacing: 0.12em;
+}
+
+.cloud-label[data-memory="true"].is-route span,
+.cloud-label[data-memory="true"].is-selected span {
+  color: rgba(231, 229, 220, 0.88);
 }
 
 .cloud-label.is-selected,
@@ -394,6 +416,15 @@ summary:focus-visible,
 .legend-line--quiet {
   background: transparent;
   border-top: 1px dashed rgba(151, 153, 151, 0.38);
+}
+
+.legend-line--history {
+  background: transparent;
+  border-top: 1px dotted rgba(166, 162, 149, 0.48);
+}
+
+.legend-line--continuity {
+  background: rgba(111, 129, 132, 0.34);
 }
 
 .scene-footer {

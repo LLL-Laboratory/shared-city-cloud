@@ -30,6 +30,11 @@ Live preview:
   for the existing condition. Each exposes its question, evidence limits,
   hypotheses, current unknown, and next evidence need. No scenario runs, no
   request starts, and no result transfers between lenses.
+- **Memory Garden** surfaces eight bounded history representations: five
+  research-history items and three project-history items. Every item is
+  representation-only and navigation-only, with effect `NONE`; visibility,
+  selection, fading, placement, and connection cannot create evidence,
+  approval, a current task, or shared-memory promotion.
 - Spatial position, motion, routes, City Pulse, and Path Replay are interface
   demonstrations, not analytics or empirical conclusions.
 - Spatial proximity is navigation, never evidence.
@@ -52,8 +57,8 @@ hosted research storage.
 - Use **Whole world** to return.
 - Use **Navigator** for the same information without 3D navigation.
 - Keyboard shortcuts: `E` Evidence Constellation, `Q` Open Questions, `C`
-  Conflict View, `S` Scenario Chamber, `T` timeline, `H` guided handover, `N` Navigator, and
-  `Escape` to close the active layer.
+  Conflict View, `S` Scenario Chamber, `M` Memory Garden, `T` timeline, `H`
+  guided handover, `N` Navigator, and `Escape` to close the active layer.
 
 Deployment details and verification boundaries are recorded in
 [`DEPLOYMENT.md`](./DEPLOYMENT.md).

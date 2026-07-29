@@ -16,6 +16,7 @@
   const navigator = document.querySelector("#navigator");
   const conflictComparison = document.querySelector("#conflictComparison");
   const scenarioChamberDialog = document.querySelector("#scenarioChamber");
+  const memoryButton = document.querySelector("#memoryButton");
   const pulseMessage = document.querySelector("#cityPulseMessage");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -35,6 +36,7 @@
     routeNodes: new Set(),
     focusNodes: new Set(),
     evidenceVisible: false,
+    memoryGardenActive: false,
     conflictPathwayId: null,
     scenarioPathwayId: null,
     scenarioReturnFocus: null,
@@ -68,6 +70,69 @@
     if (className) element.className = className;
     if (text !== undefined) element.textContent = text;
     return element;
+  }
+
+  function setMemoryTriggerState(active) {
+    state.memoryGardenActive = active;
+    memoryButton.setAttribute("aria-pressed", String(active));
+    memoryButton.setAttribute("aria-expanded", String(active));
+    app.classList.toggle("is-memory-garden", active);
+  }
+
+  function closeMemoryGarden({
+    restoreFocus = false,
+    announceUpdate = true,
+    clearRoute = true
+  } = {}) {
+    if (!state.memoryGardenActive) return;
+    setMemoryTriggerState(false);
+    if (clearRoute) {
+      state.routeNodes.clear();
+      state.focusNodes.clear();
+      if (state.selected) {
+        state.focusNodes.add("foundation");
+        state.focusNodes.add(state.selected);
+        for (const edge of data.edges) {
+          if (edge.from === state.selected) state.focusNodes.add(edge.to);
+          if (edge.to === state.selected) state.focusNodes.add(edge.from);
+        }
+      }
+    }
+    if (!state.selected) {
+      state.camera.targetGoal = [0, 0.15, -0.35];
+      orientationTitle.textContent = "SECTION 01 / LAGOS";
+      orientationHint.textContent = "ground records Â· active work Â· equal lens canopy";
+    }
+    refreshRouteClasses();
+    if (announceUpdate) {
+      announce(
+        "Memory Garden quieted. Its bounded history objects remain selectable and no research state changed."
+      );
+    }
+    if (restoreFocus) memoryButton.focus({ preventScroll: true });
+  }
+
+  function openMemoryGarden({ focusControl = false } = {}) {
+    closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
+    closeConflictComparison({ restoreRoute: false });
+    closeLayer("path");
+    closeLayer("guide");
+    if (!detailLayer.hidden) closeDetail();
+    setMemoryTriggerState(true);
+    state.routeNodes = new Set([
+      ...data.memoryGarden.itemNodeIds,
+      ...data.memoryGarden.currentReferenceNodeIds
+    ]);
+    state.focusNodes = new Set(state.routeNodes);
+    const position = averageNodePosition(data.memoryGarden.itemNodeIds);
+    state.camera.targetGoal = position.map((value) => value * 0.2);
+    orientationTitle.textContent = "MEMORY GARDEN / HISTORY ONLY";
+    orientationHint.textContent = "read-only representation / no evidence or task promotion";
+    announce(
+      `${data.memoryGarden.itemNodeIds.length} Memory Garden objects surfaced. Historical placement is navigation only; SLC-0001 remains draft with effect NONE.`
+    );
+    refreshRouteClasses();
+    if (focusControl) memoryButton.focus({ preventScroll: true });
   }
 
   function closeLayer(name) {
@@ -119,6 +184,11 @@
     const returnFocus = state.returnFocus;
     closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
     closeConflictComparison({ restoreRoute: false });
+    closeMemoryGarden({
+      restoreFocus: false,
+      announceUpdate: false,
+      clearRoute: false
+    });
     detailLayer.hidden = true;
     state.selected = null;
     state.focusNodes.clear();
@@ -235,6 +305,7 @@
   }
 
   function openConflictView(pathwayId) {
+    closeMemoryGarden({ restoreFocus: false, announceUpdate: false });
     closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
     const selectedNode = nodeById.get(state.selected);
     const targetPathwayId =
@@ -454,6 +525,7 @@
 
   function openScenarioChamber(pathwayId) {
     const initiatingControl = document.activeElement;
+    closeMemoryGarden({ restoreFocus: false, announceUpdate: false });
     if (state.selected !== "condition") renderDetail("condition");
     closeConflictComparison({ restoreRoute: false });
     state.scenarioReturnFocus = initiatingControl;
@@ -526,8 +598,15 @@
     if (detailLayer.hidden) state.returnFocus = document.activeElement;
     closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
     closeConflictComparison({ restoreRoute: false });
+    if (!node.memoryGarden) {
+      closeMemoryGarden({ restoreFocus: false, announceUpdate: false });
+    } else {
+      setMemoryTriggerState(true);
+    }
     state.selected = node.id;
-    state.routeNodes.clear();
+    state.routeNodes = node.memoryGarden
+      ? new Set([node.id, ...(node.sourceNodeIds ?? [])])
+      : new Set();
     state.evidenceVisible = node.id === "condition" || Boolean(node.evidenceSource);
     state.focusNodes = new Set([node.id, "foundation"]);
     for (const edge of data.edges) {
@@ -560,6 +639,16 @@
       ["Shared memory", node.effect],
       ["Current answer", node.currentAnswer ?? node.status]
     ];
+    if (node.memoryGarden) {
+      factEntries.push(
+        ["History track", node.track],
+        ["Represented date", node.date],
+        ["Date accuracy", node.dateAccuracy],
+        ["Representation only", node.representationOnly ? "YES" : "NO"],
+        ["Current task", node.currentTask ? "YES" : "NO"],
+        ["Shared-memory promotion", node.sharedMemoryPromotion ? "YES" : "NO"]
+      );
+    }
     if (node.sourceId) factEntries.push(["Source register ID", node.sourceId]);
     if (node.requestId) factEntries.push(["Request ID", node.requestId]);
     if (node.claimIds?.length) factEntries.push(["Claim trace", node.claimIds.join(" / ")]);
@@ -637,6 +726,16 @@
       addDetailAction("Compare unresolved pathways", () => openConflictView(), true);
     } else if (node.request) {
       addDetailAction("Return to Open Questions", () => openNavigator("Open Questions"), true);
+    } else if (node.memoryGarden) {
+      addDetailAction(
+        "Reveal the full Memory Garden",
+        () => openMemoryGarden({ focusControl: true }),
+        true
+      );
+      addDetailAction(
+        "Browse Memory Garden without 3D",
+        () => openNavigator("Memory Garden")
+      );
     }
     if (["Food", "Money", "Sand"].includes(node.territory)) {
       const pathway = data.scenarioChamber.pathways.find(
@@ -661,6 +760,8 @@
     announce(
       node.id === "condition"
         ? `${node.title} selected. ${node.label}. ${node.status}. ${data.evidenceConstellation.sourceNodeIds.length} traceable source nodes revealed with limitations.`
+        : node.memoryGarden
+          ? `${node.title} selected. ${node.label}. ${node.status}. Historical representation only; no current task or shared-memory promotion.`
         : `${node.title} selected. ${node.label}. ${node.status}.`
     );
     refreshRouteClasses();
@@ -756,6 +857,7 @@
   }
 
   function openPathReplay() {
+    closeMemoryGarden({ restoreFocus: false, announceUpdate: false });
     closeLayer("guide");
     pathLayer.hidden = false;
     state.pathIndex = 0;
@@ -791,6 +893,7 @@
   }
 
   function openGuidedHandover() {
+    closeMemoryGarden({ restoreFocus: false, announceUpdate: false });
     closeLayer("path");
     guideLayer.hidden = false;
     document.querySelector("#handoverButton").setAttribute("aria-expanded", "true");
@@ -822,7 +925,8 @@
     "Evidence Constellation",
     "Source / Detail Fragments",
     "Methods & Handoffs",
-    "Open Questions"
+    "Open Questions",
+    "Memory Garden"
   ];
 
   function buildNavigator() {
@@ -896,6 +1000,14 @@
   }
 
   buildNavigator();
+  memoryButton.addEventListener("click", () => {
+    if (state.memoryGardenActive) {
+      if (nodeById.get(state.selected)?.memoryGarden) closeDetail();
+      else closeMemoryGarden({ restoreFocus: true });
+    } else {
+      openMemoryGarden({ focusControl: true });
+    }
+  });
   document.querySelector("#navigatorButton").addEventListener("click", () => {
     if (navigator.hidden) openNavigator();
     else closeLayer("navigator");
@@ -971,6 +1083,9 @@
       else if (!timelineLayer.hidden) closeLayer("timeline");
       else if (!conflictComparison.hidden) closeConflictComparison();
       else if (!detailLayer.hidden) closeDetail();
+      else if (state.memoryGardenActive) {
+        closeMemoryGarden({ restoreFocus: true });
+      }
       return;
     }
     if (event.key.toLowerCase() === "n") openNavigator();
@@ -980,6 +1095,10 @@
     if (event.key.toLowerCase() === "q") renderDetail("thoughts");
     if (event.key.toLowerCase() === "c") openConflictView();
     if (event.key.toLowerCase() === "s") openScenarioChamber();
+    if (event.key.toLowerCase() === "m") {
+      if (state.memoryGardenActive) closeMemoryGarden({ restoreFocus: true });
+      else openMemoryGarden({ focusControl: true });
+    }
     if (document.activeElement === canvas) {
       if (event.key === "ArrowLeft") state.camera.yaw -= 0.08;
       if (event.key === "ArrowRight") state.camera.yaw += 0.08;
@@ -994,6 +1113,7 @@
     button.dataset.nodeId = node.id;
     button.dataset.hierarchy = String(node.hierarchy ?? 3);
     if (node.evidenceSource) button.dataset.evidence = "true";
+    if (node.memoryGarden) button.dataset.memory = "true";
     button.tabIndex = -1;
     button.setAttribute("aria-label", `Select ${node.title}, ${node.label}`);
     button.append(makeElement("span", "", node.title), makeElement("small", "", node.label));
@@ -1666,6 +1786,23 @@
             guide.alpha
           );
         }
+        continue;
+      }
+
+      if (guide.kind === "memory") {
+        for (let index = 0; index < guide.nodeIds.length - 1; index += 1) {
+          drawGuideVertices(
+            viewProjection,
+            curveVertices(
+              positions.get(guide.nodeIds[index]),
+              positions.get(guide.nodeIds[index + 1]),
+              true,
+              -0.12
+            ),
+            guide.color,
+            state.memoryGardenActive ? 0.16 : guide.alpha
+          );
+        }
       }
     }
 
@@ -1722,6 +1859,8 @@
     if (edge.kind === "evidence-trace") return [0.66, 0.64, 0.56];
     if (edge.kind === "unresolved") return [0.39, 0.4, 0.4];
     if (edge.kind === "active-route") return [0.48, 0.58, 0.61];
+    if (edge.kind === "history-reference") return [0.46, 0.44, 0.4];
+    if (edge.kind === "implementation-continuity") return [0.36, 0.42, 0.43];
     if (edge.kind === "equal-standing") return [0.59, 0.59, 0.56];
     if (edge.kind === "record" || edge.kind === "provenance") return [0.64, 0.63, 0.58];
     if (edge.kind === "separate-response") return [0.53, 0.55, 0.53];
@@ -1775,6 +1914,9 @@
               ? 0.65
               : edge.kind === "evidence-trace"
                 ? 0.52
+              : edge.kind === "history-reference" ||
+                  edge.kind === "implementation-continuity"
+                ? 0.13
               : edge.quiet
                 ? 0.3
                 : edge.kind === "equal-standing"
@@ -1851,6 +1993,10 @@
     gl.uniform1f(meshLocations.fragment, node.fragment || node.evidenceSource ? 1 : 0);
     const baseAlpha = future
       ? 0.045
+      : node.memoryGarden
+        ? isSelected || isRoute || state.memoryGardenActive
+          ? 0.62
+          : 0.17
       : node.evidenceSource
         ? 0.88
       : node.fragment
@@ -1871,6 +2017,14 @@
   function shouldShowLabel(node) {
     if (node.stage > state.timelineStage) return false;
     if (node.evidenceSource) return state.evidenceVisible;
+    if (node.memoryGarden) {
+      return (
+        state.memoryGardenActive ||
+        state.selected === node.id ||
+        state.hovered === node.id ||
+        state.routeNodes.has(node.id)
+      );
+    }
     if (node.primary) return true;
     if (state.selected === node.id || state.hovered === node.id || state.routeNodes.has(node.id)) {
       return true;

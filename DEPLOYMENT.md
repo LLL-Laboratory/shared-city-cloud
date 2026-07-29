@@ -18,7 +18,7 @@ literal and bypasses Jekyll processing.
 `PAGES_MANIFEST_SHA256.csv` records the byte count and SHA-256 digest of every
 published artifact file except the manifest itself.
 
-The runtime includes four bounded research utilities in the same spatial
+The runtime includes five bounded research utilities in the same spatial
 world and focused reading surface:
 
 - traceable evidence-register nodes revealed from `SLC-0001`;
@@ -26,6 +26,9 @@ world and focused reading surface:
 - a side-by-side Conflict View whose causal pathways remain unresolved.
 - a read-only Scenario Chamber with equal Food, Money, and Sand corridors,
   no run, no prediction, and no cross-lens synthesis.
+- a quiet Memory Garden with eight bounded representation-only,
+  navigation-only history objects and no evidence, approval, task, or
+  shared-memory promotion.
 
 ## Validation contract
 
@@ -35,7 +38,7 @@ are missing. The public artifact also excludes machine-local paths and replaces
 them with stable provenance descriptions. It also verifies that the three
 research utilities retain source limitations, `NOT STARTED` request status,
 `HOLD` conflict status, Scenario Chamber no-run boundaries, equal lens
-treatment, and non-3D access.
+treatment, Memory Garden no-promotion boundaries, and non-3D access.
 
 This static preview does not unlock hosted records, team access, identity,
 database, MCP/API, external AI, analytics, automatic capture, or external data
