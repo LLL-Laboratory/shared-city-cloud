@@ -2457,7 +2457,13 @@ export function bindReviewQueueUI(options = {}) {
   }
 
   function showDialog() {
-    returnFocus = document.activeElement;
+    const activeElement = document.activeElement;
+    returnFocus =
+      activeElement instanceof HTMLElement &&
+      activeElement !== document.body &&
+      activeElement !== document.documentElement
+        ? activeElement
+        : openButton;
     openButton.setAttribute("aria-expanded", "true");
     if (typeof dialog.showModal === "function" && !dialog.open) {
       dialog.showModal();
