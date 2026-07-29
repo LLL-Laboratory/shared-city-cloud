@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "artifactVersion": "0.5.0",
+  "artifactVersion": "0.6.0",
   "hostingProvider": "GITHUB PAGES ONLY",
   "deploymentStatus": "PUBLISHABLE STATIC ARTIFACT",
   "repository": "LLL-Laboratory/shared-city-cloud",
@@ -17,6 +17,7 @@
     "styles.css",
     "atlas.css",
     "app.js",
+    "review-queue.mjs",
     "data.generated.js"
   ],
   "researchConstraints": {
@@ -33,7 +34,19 @@
     "conflictView": "4 UNRESOLVED PATHWAYS / NO SETTLED CAUSE",
     "scenarioChamber": "3 EQUAL READ-ONLY LENS PATHWAYS / NO RUN OR CROSS-LENS SYNTHESIS",
     "memoryGarden": "8 BOUNDED HISTORY REPRESENTATIONS / NO EVIDENCE, TASK, OR MEMORY PROMOTION",
-    "orbitalModel": "3 EQUAL LENS BODIES / STILL DATUM / FIXED LOCAL SYSTEMS / NO RESEARCH MEANING"
+    "orbitalModel": "3 EQUAL LENS BODIES / STILL DATUM / FIXED LOCAL SYSTEMS / NO RESEARCH MEANING",
+    "workingReviewQueue": "BROWSER-LOCAL CONDITIONAL WORKFLOW / EMPTY PUBLIC SEED / RECORD EFFECT NONE"
+  },
+  "localWorkflow": {
+    "persistence": "BROWSER LOCALSTORAGE ONLY",
+    "storageKey": "lll.shared-city-cloud.review-queue.v1",
+    "defaultState": "EMPTY",
+    "publicSeedCount": 0,
+    "shared": false,
+    "authenticated": false,
+    "protectedRecordMutation": false,
+    "recordEffect": "NONE",
+    "empiricalTruthFromApproval": false
   },
   "exclusions": [
     "NO EXTERNAL DATA COLLECTION",

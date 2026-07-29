@@ -16,6 +16,7 @@
   const navigator = document.querySelector("#navigator");
   const conflictComparison = document.querySelector("#conflictComparison");
   const scenarioChamberDialog = document.querySelector("#scenarioChamber");
+  const reviewQueueDialog = document.querySelector("#reviewQueue");
   const memoryButton = document.querySelector("#memoryButton");
   const pulseMessage = document.querySelector("#cityPulseMessage");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -950,6 +951,7 @@
     "City Foundation",
     "Active Work Horizon",
     "Scenario Chamber",
+    "Working Review Queue",
     "Food Territory",
     "Money Territory",
     "Sand Territory",
@@ -987,6 +989,34 @@
         card.addEventListener("click", () => {
           closeLayer("navigator");
           openScenarioChamber();
+        });
+        grid.append(card);
+        group.append(grid);
+        root.append(group);
+        continue;
+      }
+      if (title === "Working Review Queue") {
+        const group = makeElement("section", "navigator-group");
+        group.dataset.group = title;
+        group.append(makeElement("h3", "", title));
+        const grid = makeElement("div", "navigator-grid");
+        const card = makeElement("button", "navigator-card");
+        card.type = "button";
+        card.dataset.hierarchy = "2";
+        card.setAttribute("aria-controls", "reviewQueue");
+        card.setAttribute("aria-expanded", "false");
+        card.append(
+          makeElement(
+            "small",
+            "",
+            `${data.workingReviewQueue.status} · BROWSER LOCAL / NOT SHARED`
+          ),
+          makeElement("strong", "", "Working Review Queue"),
+          makeElement("span", "", data.workingReviewQueue.disclosure)
+        );
+        card.addEventListener("click", () => {
+          closeLayer("navigator");
+          document.querySelector("#reviewQueueButton").click();
         });
         grid.append(card);
         group.append(grid);
@@ -1098,6 +1128,13 @@
 
   document.querySelector("#resetView").addEventListener("click", resetView);
 
+  document.querySelector("#reviewQueueButton").addEventListener("click", () => {
+    closeScenarioChamber({ restoreFocus: false, announceUpdate: false });
+    closeLayer("navigator");
+    closeLayer("path");
+    closeLayer("guide");
+  });
+
   const lensShortcutIds = {
     "1": "lens-food",
     "2": "lens-money",
@@ -1105,6 +1142,8 @@
   };
 
   window.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented) return;
+    if (reviewQueueDialog.open) return;
     if (scenarioChamberDialog.open) {
       if (event.key === "Escape") {
         event.preventDefault();

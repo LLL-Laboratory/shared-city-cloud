@@ -18,8 +18,8 @@ literal and bypasses Jekyll processing.
 `PAGES_MANIFEST_SHA256.csv` records the byte count and SHA-256 digest of every
 published artifact file except the manifest itself.
 
-The runtime includes five bounded research utilities in the same spatial
-world and focused reading surface:
+The runtime includes the established bounded research utilities in the same
+spatial world and focused reading surface:
 
 - traceable evidence-register nodes revealed from `SLC-0001`;
 - an Open Questions region for holds, unknowns, and proposed requests;
@@ -29,6 +29,13 @@ world and focused reading surface:
 - a quiet Memory Garden with eight bounded representation-only,
   navigation-only history objects and no evidence, approval, task, or
   shared-memory promotion.
+
+It also includes a separate **Working Review Queue**. Its public seed is empty.
+User-created drafts, review events, and decisions persist only under one
+namespaced key in that browser profile. They are never uploaded or merged into
+the atlas, protected authorities, `SLC-0001`, lens records, or shared memory.
+Food, Money, and Sand remain equal targets. A local `APPROVED` state is a
+conditional governance outcome only, not empirical truth.
 
 The interface also presents a still shared-city datum and three exactly equal,
 evenly phased, slow lens bodies. This orbital model is navigation and
@@ -40,15 +47,21 @@ research meaning and cannot alter the protected research state.
 
 The build fails if protected research state drifts, if browser runtime files
 contain external service requests, or if project-subpath-safe asset references
-are missing. The public artifact also excludes machine-local paths and replaces
-them with stable provenance descriptions. It also verifies that the three
-research utilities retain source limitations, `NOT STARTED` request status,
-`HOLD` conflict status, Scenario Chamber no-run boundaries, equal lens
-treatment, Memory Garden no-promotion boundaries, and non-3D access.
+are missing. Browser persistence is permitted only inside `review-queue.mjs`
+and only for the exact Working Review Queue key; session storage, IndexedDB,
+cookies, network transports, service workers, and clearing all origin storage
+remain prohibited. The public artifact also excludes machine-local paths and
+replaces them with stable provenance descriptions. It verifies source
+limitations, `NOT STARTED` request status, `HOLD` conflict status, Scenario
+Chamber no-run boundaries, equal lens treatment, Memory Garden no-promotion
+boundaries, and non-3D access.
 It additionally verifies equal lens-body and orbit parameters, fixed local
 systems, whole-world return, keyboard selection, reduced-motion freezing, and
 the exact no-research-meaning boundary.
 
-This static preview does not unlock hosted records, team access, identity,
-database, MCP/API, external AI, analytics, automatic capture, or external data
-collection.
+This static preview does not unlock hosted records, team access, authenticated
+identity, a database, MCP/API, external AI, analytics, automatic capture, or
+external data collection. Real multi-person review requires a later hosted
+application with authenticated roles, server-side validation, transactional
+append-only storage and audit history, concurrency handling, backups, and
+privacy controls.

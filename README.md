@@ -1,6 +1,6 @@
 # LLL Laboratory Shared City Cloud
 
-**Status:** PUBLIC READ-ONLY PROTOTYPE / FOR REVIEW
+**Status:** PUBLIC STATIC PROTOTYPE / PROTECTED RESEARCH READ-ONLY / FOR REVIEW
 
 This repository contains the bounded static preview of LLL Laboratory's Shared
 City Cloud. Its primary surface is an original 3D research-atlas world with a
@@ -53,7 +53,9 @@ and minimal public documentation. The underlying research authorities, local
 record system, handovers, rejected prototypes, credentials, and private
 workspace are intentionally not published.
 
-The preview is read-only. It has no identity system, database, external AI,
+The published atlas and protected research are read-only. The Working Review
+Queue described below writes only to one namespaced key in the current browser
+profile. The site has no identity system, hosted database, external AI,
 MCP/API, analytics, automatic chat capture, external data collection, or
 hosted research storage.
 
@@ -65,8 +67,38 @@ hosted research storage.
 - Use **Navigator** for the same information without 3D navigation.
 - Keyboard shortcuts: `1` Food, `2` Money, `3` Sand, `E` Evidence
   Constellation, `Q` Open Questions, `C` Conflict View, `S` Scenario Chamber,
-  `M` Memory Garden, `T` timeline, `H` guided handover, `N` Navigator, and
-  `Escape` to close the active layer.
+  `M` Memory Garden, `R` Working Review Queue, `T` timeline, `H` guided
+  handover, `N` Navigator, and `Escape` to close the active layer.
+
+## Working Review Queue
+
+The **Review** control opens a single-device workflow prototype. A person can
+save an immutable local draft, send it to pending review, append conditional
+placeholder decisions, inspect the local event/decision history, and export,
+import, or reset that queue.
+
+- Submission kinds are Evidence, Question, Proposal, and Finding.
+- The required research label remains one of the exact contract labels.
+- Shared Foundation, Food, Money, and Sand are the only targets; the three
+  lenses have equal fields and behavior.
+- Raw workflow states are `DRAFT`, `UNDER_REVIEW`, `APPROVED`, `AMENDED`,
+  `HELD`, `REJECTED`, and `SUPERSEDED`.
+- `APPROVED` is displayed as a local governance outcome. It is never empirical
+  truth and never changes the submission's research label.
+- Unknowns, missing evidence, uncertainty, competing accounts, and conflicting
+  reviewer outcomes remain visible.
+
+Queue entries are stored only in this browser profile. They are unencrypted,
+may be cleared, are not uploaded, are not shared across people or devices, and
+are not seeded into this public artifact. Reviewer descriptors are
+unauthenticated placeholders. The queue cannot write the protected research
+authorities, change `SLC-0001`, update shared memory, or add evidence to the
+atlas; every action has record effect `NONE`.
+
+Real team review will require a later hosted application with authenticated
+identities and permissions, a transactional database or object store,
+server-side validation, append-only audit history, concurrency/conflict
+handling, backups, and privacy controls.
 
 Deployment details and verification boundaries are recorded in
 [`DEPLOYMENT.md`](./DEPLOYMENT.md).

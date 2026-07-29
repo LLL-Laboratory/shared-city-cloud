@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A read-only spatial prototype for the LLL Laboratory Shared City Cloud."
+      content="A spatial atlas with a browser-local prototype review queue for the LLL Laboratory Shared City Cloud."
     />
     <title>Shared City Cloud · Spatial Prototype</title>
     <link rel="stylesheet" href="./styles.css" />
@@ -53,6 +53,17 @@
           >
             <span aria-hidden="true">M</span>
             <span>Memory</span>
+          </button>
+          <button
+            id="reviewQueueButton"
+            class="round-action"
+            type="button"
+            aria-expanded="false"
+            aria-controls="reviewQueue"
+            aria-keyshortcuts="R"
+          >
+            <span aria-hidden="true">R</span>
+            <span>Review</span>
           </button>
           <button
             id="navigatorButton"
@@ -177,6 +188,254 @@
         </footer>
       </dialog>
 
+      <dialog
+        id="reviewQueue"
+        class="review-queue"
+        aria-labelledby="reviewQueueTitle"
+        aria-describedby="reviewQueueDisclosure"
+      >
+        <header class="review-queue__head">
+          <div>
+            <p class="kicker">Working Review Queue</p>
+            <h2 id="reviewQueueTitle">Local drafts, visible decisions</h2>
+          </div>
+          <button
+            id="reviewQueueClose"
+            class="icon-button"
+            type="button"
+            aria-label="Close Working Review Queue"
+          >×</button>
+        </header>
+
+        <p id="reviewQueueDisclosure" class="review-queue__disclosure">
+          GitHub Pages publishes read-only application files and protected research remains
+          read-only. Entries made here stay only in this browser profile, are not uploaded or
+          publicly seeded, and never change SLC-0001, a lens record, or shared memory. Storage is
+          unencrypted, may be cleared, and is not shared across people or devices. Reviewer
+          descriptors are unauthenticated placeholders. A local approval is a governance outcome,
+          not empirical truth. Real multi-person review requires a later authenticated database
+          and hosted application.
+        </p>
+
+        <div class="review-queue__toolbar" aria-label="Local review queue controls">
+          <button id="reviewQueueNew" type="button">New local draft</button>
+          <button id="reviewQueueExport" type="button">Export local JSON</button>
+          <button id="reviewQueueImport" type="button">Import local JSON</button>
+          <input
+            id="reviewQueueImportFile"
+            class="sr-only"
+            type="file"
+            accept="application/json,.json"
+            aria-label="Choose a Working Review Queue JSON export"
+          />
+          <button id="reviewQueueReset" type="button">Reset this queue</button>
+          <span id="reviewQueueStatus" role="status" aria-live="polite">
+            BROWSER LOCAL / EMPTY BY DEFAULT / RECORD EFFECT NONE
+          </span>
+        </div>
+
+        <div class="review-queue__workspace">
+          <aside class="review-queue__list-panel" aria-labelledby="reviewQueueListTitle">
+            <div class="review-queue__section-head">
+              <div>
+                <p class="kicker">This browser only</p>
+                <h3 id="reviewQueueListTitle">Submissions</h3>
+              </div>
+            </div>
+            <p id="reviewQueueEmpty" class="review-queue__empty">
+              No local submissions. The published artifact contains no private queue entries.
+            </p>
+            <div id="reviewQueueList" class="review-queue__list"></div>
+          </aside>
+
+          <section id="reviewQueueCreatePanel" class="review-queue__panel" hidden aria-labelledby="reviewQueueCreateTitle">
+            <div class="review-queue__section-head">
+              <div>
+                <p class="kicker">Immutable after save</p>
+                <h3 id="reviewQueueCreateTitle">Create a local draft</h3>
+              </div>
+              <button id="reviewQueueCancelDraft" type="button">Cancel</button>
+            </div>
+            <form id="reviewQueueCreateForm" class="review-form">
+              <div class="review-form__grid">
+                <label>
+                  <span>Submission kind</span>
+                  <select name="submissionKind" required>
+                    <option value="EVIDENCE">Evidence</option>
+                    <option value="QUESTION">Question</option>
+                    <option value="PROPOSAL" selected>Proposal</option>
+                    <option value="FINDING">Finding</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Target</span>
+                  <select name="targetId" required>
+                    <option value="SHARED_FOUNDATION">Shared foundation / SLC-0001</option>
+                    <option value="FOOD">Food Lens</option>
+                    <option value="MONEY">Money Lens</option>
+                    <option value="SAND">Sand Lens</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Required research label</span>
+                  <select name="researchLabel" required>
+                    <option value="EVIDENCE">EVIDENCE</option>
+                    <option value="DERIVED">DERIVED</option>
+                    <option value="ASSUMPTION">ASSUMPTION</option>
+                    <option value="HYPOTHESIS">HYPOTHESIS</option>
+                    <option value="PROPOSAL" selected>PROPOSAL</option>
+                    <option value="UNKNOWN / NOT ESTIMABLE">UNKNOWN / NOT ESTIMABLE</option>
+                    <option value="APPROVED">APPROVED</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Native label, if any</span>
+                  <input name="nativeLabel" maxlength="160" />
+                </label>
+              </div>
+              <label>
+                <span>Title</span>
+                <input name="title" maxlength="180" required />
+              </label>
+              <label>
+                <span>Statement</span>
+                <textarea name="statement" rows="3" maxlength="2400" required></textarea>
+              </label>
+              <label>
+                <span>Proposed change summary</span>
+                <textarea name="proposedChangeSummary" rows="2" maxlength="1200" required></textarea>
+              </label>
+              <div class="review-form__grid">
+                <label>
+                  <span>Place or explicit UNKNOWN</span>
+                  <input name="place" maxlength="240" required />
+                </label>
+                <label>
+                  <span>Time or explicit UNKNOWN</span>
+                  <input name="time" maxlength="240" required />
+                </label>
+              </div>
+              <label>
+                <span>Uncertainty or competing account</span>
+                <textarea name="uncertaintyOrCompetition" rows="2" maxlength="1600" required></textarea>
+              </label>
+              <label>
+                <span>Missing evidence, one item per line</span>
+                <textarea name="missingEvidence" rows="2" maxlength="1600"></textarea>
+              </label>
+              <label>
+                <span>Next test or review</span>
+                <textarea name="nextTestOrReview" rows="2" maxlength="1200" required></textarea>
+              </label>
+              <label>
+                <span>Source or method references, one per line</span>
+                <textarea name="sourceRefs" rows="2" maxlength="2000" required></textarea>
+              </label>
+              <div class="review-form__grid">
+                <label>
+                  <span>Contributor descriptor / not authenticated</span>
+                  <input name="submittedByDescriptor" maxlength="180" required />
+                </label>
+                <label>
+                  <span>Exact reason for submission</span>
+                  <input name="exactReason" maxlength="600" required />
+                </label>
+              </div>
+              <input name="supersedesSubmissionId" type="hidden" />
+              <p class="review-form__boundary">
+                Saving creates an immutable DRAFT snapshot. Later corrections create a linked new
+                submission; there is no silent overwrite.
+              </p>
+              <button type="submit">Save immutable local draft</button>
+            </form>
+          </section>
+
+          <section id="reviewQueueDetail" class="review-queue__panel" hidden aria-labelledby="reviewQueueDetailTitle">
+            <div class="review-queue__section-head">
+              <div>
+                <p class="kicker">Submission / immutable history</p>
+                <h3 id="reviewQueueDetailTitle"></h3>
+              </div>
+            </div>
+            <div id="reviewQueueDetailMeta" class="review-queue__meta"></div>
+            <div id="reviewQueueDetailBody" class="review-queue__body"></div>
+            <div class="review-queue__actions">
+              <button id="reviewQueueSubmitReview" type="button">Send to pending review</button>
+              <button id="reviewQueueRevise" type="button">Create revised draft</button>
+            </div>
+
+            <form id="reviewQueueDecisionForm" class="review-form review-form--decision" hidden>
+              <div class="review-queue__section-head">
+                <div>
+                  <p class="kicker">Conditional policy / not real authority</p>
+                  <h4>Record a placeholder decision</h4>
+                </div>
+              </div>
+              <div class="review-form__grid">
+                <label>
+                  <span>Outcome</span>
+                  <select name="proposedOutcome" required>
+                    <option value="APPROVED">Accept → APPROVED GOVERNANCE</option>
+                    <option value="AMENDED">Amend</option>
+                    <option value="HELD">Hold</option>
+                    <option value="REJECTED">Reject</option>
+                    <option value="SUPERSEDED">Supersede</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Reviewer slot</span>
+                  <select name="reviewerSlot" required>
+                    <option value="1">Placeholder slot 1</option>
+                    <option value="2">Placeholder slot 2</option>
+                    <option value="3">Placeholder slot 3</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Reviewer descriptor / not authenticated</span>
+                  <input name="reviewerDescriptor" maxlength="180" required />
+                </label>
+                <label>
+                  <span>Replacement submission for supersede</span>
+                  <select name="relatedSubmissionId">
+                    <option value="">None</option>
+                  </select>
+                </label>
+              </div>
+              <label>
+                <span>Decision rationale</span>
+                <textarea name="exactReason" rows="3" maxlength="1600" required></textarea>
+              </label>
+              <label>
+                <span>Required changes for amend, one per line</span>
+                <textarea name="requiredChanges" rows="2" maxlength="1600"></textarea>
+              </label>
+              <button type="submit">Append decision</button>
+            </form>
+
+            <section class="review-queue__history-section" aria-labelledby="reviewQueueHistoryTitle">
+              <p class="kicker">Append-only local log</p>
+              <h4 id="reviewQueueHistoryTitle">Events and decisions</h4>
+              <div id="reviewQueueHistory" class="review-queue__history"></div>
+            </section>
+          </section>
+
+          <section id="reviewQueueWelcome" class="review-queue__panel review-queue__welcome" aria-label="Working Review Queue orientation">
+            <p class="kicker">Single-device prototype</p>
+            <h3>Select a local submission or create a draft.</h3>
+            <p>
+              Food, Money, and Sand have equal target options. Unknowns and conflicts remain
+              visible through review. The queue never adds evidence to the atlas and never changes
+              a protected record.
+            </p>
+          </section>
+        </div>
+
+        <footer class="review-queue__foot">
+          <span>LOCALSTORAGE ONLY / NO IDENTITY / NO UPLOAD / RECORD EFFECT NONE</span>
+          <span>Later phase: authenticated roles, hosted database, server validation, audit log, privacy and concurrency controls.</span>
+        </footer>
+      </dialog>
+
       <section id="pathReplay" class="route-layer" hidden aria-labelledby="pathTitle">
         <div class="route-layer__head">
           <div>
@@ -218,7 +477,7 @@
           <div>
             <p class="kicker">Non-3D route</p>
             <h2 id="navigatorTitle">The same research world, without 3D</h2>
-            <p>Every object opens the same labels, status, sources, limits, and explicit relationships. Food, Money, and Sand retain equal Navigator access through the same focused local-system view; their position and motion carry no research meaning. Evidence Constellation, Open Questions, and Memory Garden are complete scene groups; Conflict View and the read-only Scenario Chamber use the same focused surfaces and data in 3D and non-3D routes.</p>
+            <p>Every object opens the same labels, status, sources, limits, and explicit relationships. Food, Money, and Sand retain equal Navigator access through the same focused local-system view; their position and motion carry no research meaning. Evidence Constellation, Open Questions, and Memory Garden are complete scene groups; Conflict View and the read-only Scenario Chamber use the same focused surfaces and data in 3D and non-3D routes. Working Review Queue is a separate browser-local route and never becomes a research node.</p>
           </div>
           <button class="icon-button" type="button" data-close="navigator" aria-label="Close navigator">×</button>
         </div>
@@ -233,16 +492,18 @@
       <div id="liveRegion" class="sr-only" role="status" aria-live="polite"></div>
 
       <footer class="scene-footer">
-        <span>GITHUB PAGES / READ ONLY</span>
+        <span>PUBLISHED RESEARCH / READ ONLY</span>
+        <span>Review drafts / this browser only</span>
         <span>No external services</span>
         <button id="resetView" type="button">Reset view</button>
       </footer>
     </main>
 
     <noscript>
-      <p class="noscript">This read-only prototype needs JavaScript to render its 3D and non-3D views.</p>
+      <p class="noscript">This prototype needs JavaScript to render the atlas and its browser-local review queue.</p>
     </noscript>
     <script src="./data.generated.js"></script>
     <script src="./app.js"></script>
+    <script type="module" src="./review-queue.mjs"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 /* Generated from protected local research authority inputs. */
 window.SCC_DATA = {
-  "schemaVersion": "2.4.0",
+  "schemaVersion": "2.5.0",
   "sourceAuthority": "Protected local Shared Record Core, incident-register, and evidence-brief snapshots; authority files are not part of this public preview",
   "sourceRecords": {
     "incidentRegister": "SLC-0001 incident evidence register - INC-00 to INC-07 and INC-TIME-01",
@@ -3718,6 +3718,111 @@ window.SCC_DATA = {
     "motionMeaning": "NAVIGATION / ATMOSPHERE ONLY",
     "researchMeaningBoundary": "ORBIT, POSITION, PROXIMITY, AND LOCAL PLACEMENT CARRY NO RESEARCH MEANING"
   },
+  "workingReviewQueue": {
+    "schemaVersion": "1.0.0",
+    "status": "LOCAL WORKFLOW PROTOTYPE",
+    "persistence": "BROWSER LOCALSTORAGE ONLY / SINGLE DEVICE / NOT SHARED",
+    "storageKey": "lll.shared-city-cloud.review-queue.v1",
+    "initialItemCount": 0,
+    "publicSeed": [],
+    "authorityEffect": "NONE",
+    "sharedMemoryEffect": "NONE",
+    "empiricalTruthFromApproval": false,
+    "protectedRecordMutation": false,
+    "sharedPersistence": false,
+    "authenticated": false,
+    "reviewerIdentity": "UNAUTHENTICATED PLACEHOLDER",
+    "itemTypes": [
+      "EVIDENCE",
+      "QUESTION",
+      "PROPOSAL",
+      "FINDING"
+    ],
+    "researchLabels": [
+      "EVIDENCE",
+      "DERIVED",
+      "ASSUMPTION",
+      "HYPOTHESIS",
+      "PROPOSAL",
+      "UNKNOWN / NOT ESTIMABLE",
+      "APPROVED"
+    ],
+    "workflowStates": [
+      "DRAFT",
+      "UNDER_REVIEW",
+      "APPROVED",
+      "AMENDED",
+      "HELD",
+      "REJECTED",
+      "SUPERSEDED"
+    ],
+    "decisionOutcomes": [
+      "APPROVED",
+      "AMENDED",
+      "HELD",
+      "REJECTED",
+      "SUPERSEDED"
+    ],
+    "policy": {
+      "policyId": "CONDITIONAL-THREE-REVIEWER-01",
+      "status": "CONDITIONAL / NOT TEAM-APPROVED",
+      "authorityEffect": "NONE",
+      "reviewerSlots": 3,
+      "routineConcurringDecisions": 1,
+      "consequentialConcurringDecisions": 2
+    },
+    "targets": [
+      {
+        "id": "SHARED_FOUNDATION",
+        "title": "Shared foundation / SLC-0001",
+        "targetRecordId": "SLC-0001",
+        "targetRecordVersion": 1,
+        "targetRecordSha256": "738C798B04185841D7B915371D759C1ADA9BF2DE7594836E61034BEF5D43B550",
+        "layer": "SHARED_CITY",
+        "lens": null,
+        "protectedStatus": "DRAFT / FOR TEAM REVIEW",
+        "currentAnswer": "The narrow roadway-inundation and mobility-disruption claim is supported at corridor and morning scope; exact boundary, duration, causes, and lens impacts remain unresolved.",
+        "recordEffect": "NONE"
+      },
+      {
+        "id": "FOOD",
+        "title": "Food Lens",
+        "targetRecordId": "SLC-0001-FOOD-01",
+        "targetRecordVersion": 1,
+        "targetRecordSha256": "C7897ACF8770E477D76FB2C9D85F71248110A49AAEBC714A92E28AD3224FB57D",
+        "layer": "LENS",
+        "lens": "Food",
+        "protectedStatus": "DRAFT / FOR TEAM REVIEW",
+        "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
+        "recordEffect": "NONE"
+      },
+      {
+        "id": "MONEY",
+        "title": "Money Lens",
+        "targetRecordId": "SLC-0001-MONEY-01",
+        "targetRecordVersion": 1,
+        "targetRecordSha256": "BED398A4F626F4C6043259DDEB9D5C5A7312D4CBCDB38E80241AFD0CB4F7A758",
+        "layer": "LENS",
+        "lens": "Money",
+        "protectedStatus": "DRAFT / FOR TEAM REVIEW",
+        "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
+        "recordEffect": "NONE"
+      },
+      {
+        "id": "SAND",
+        "title": "Sand Lens",
+        "targetRecordId": "SLC-0001-SAND-01",
+        "targetRecordVersion": 1,
+        "targetRecordSha256": "257215EB5C138679732EE058D5B43FD5A72440F2694054A07115E975B8629B07",
+        "layer": "LENS",
+        "lens": "Sand",
+        "protectedStatus": "DRAFT / FOR TEAM REVIEW",
+        "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
+        "recordEffect": "NONE"
+      }
+    ],
+    "disclosure": "GitHub Pages publishes read-only application files. User-created queue entries remain only in this browser profile, are not uploaded or publicly seeded, and never change SLC-0001, a lens record, or shared memory. Real multi-person review requires a later authenticated database and hosted application."
+  },
   "interactionClaims": {
     "cityPulse": "INTERACTION DEMONSTRATION ONLY",
     "timeSlider": "KNOWN TIMESTAMPS SEPARATED FROM ILLUSTRATIVE POSITIONING",
@@ -3729,6 +3834,7 @@ window.SCC_DATA = {
     "scenarioChamber": "THREE EQUAL READ-ONLY LENS PATHWAYS; NO RUN, PREDICTION, CAUSAL RESULT, OR CROSS-LENS SYNTHESIS",
     "memoryGarden": "QUIET READ-ONLY HISTORY NAVIGATION; NO EVIDENCE, APPROVAL, TASK, OR SHARED-MEMORY PROMOTION",
     "orbitalModel": "ORBIT, POSITION, PROXIMITY, AND LOCAL PLACEMENT CARRY NO RESEARCH MEANING",
+    "workingReviewQueue": "BROWSER-LOCAL CONDITIONAL WORKFLOW ONLY; EMPTY BY DEFAULT; NO PROTECTED-RECORD, SHARED-MEMORY, OR EMPIRICAL-TRUTH EFFECT",
     "guidedHandover": "READ-ONLY OPTIONAL ROUTE; NON-3D EQUIVALENT PROVIDED",
     "spatialGrammar": "GROUNDED RECORD FIELD; MIDDLE ACTIVE WORK; EQUAL LENS CANOPY; CENTRAL CITY DATUM",
     "materialSystem": "NEAR-BLACK ATLAS; NEUTRAL MATERIALS; MUTED MEANINGFUL ACCENTS",
