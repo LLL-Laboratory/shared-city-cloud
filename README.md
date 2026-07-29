@@ -15,6 +15,11 @@ Live preview:
 - Its shared-memory effect remains `NONE`.
 - Food, Money, and Sand remain equal, separate, and individually
   `UNKNOWN / NOT ESTIMABLE`.
+- A still shared-city datum is the home orientation. Food, Money, and Sand use
+  exactly equal, slow lens bodies on one evenly phased path for navigation and
+  atmosphere only. Each selected lens reveals its own fixed nearby record,
+  source fragment, unresolved impact, and proposed request; those local objects
+  do not orbit Lagos.
 - `CLM-01 ACCEPT` and `CLM-02 HOLD` are claim-level decisions only. Neither
   approves the full record.
 - Selecting `SLC-0001` reveals nine traceable source-register nodes with their
@@ -35,9 +40,11 @@ Live preview:
   representation-only and navigation-only, with effect `NONE`; visibility,
   selection, fading, placement, and connection cannot create evidence,
   approval, a current task, or shared-memory promotion.
-- Spatial position, motion, routes, City Pulse, and Path Replay are interface
+- Orbit, position, proximity, and local placement carry no research meaning.
+  They cannot change a label, answer, status, effect, evidence state, approval,
+  task state, or shared memory.
+- Spatial motion, routes, City Pulse, and Path Replay are interface
   demonstrations, not analytics or empirical conclusions.
-- Spatial proximity is navigation, never evidence.
 
 ## Public boundary
 
@@ -56,9 +63,10 @@ hosted research storage.
 - Select an object to open its focused reading layer.
 - Use **Whole world** to return.
 - Use **Navigator** for the same information without 3D navigation.
-- Keyboard shortcuts: `E` Evidence Constellation, `Q` Open Questions, `C`
-  Conflict View, `S` Scenario Chamber, `M` Memory Garden, `T` timeline, `H`
-  guided handover, `N` Navigator, and `Escape` to close the active layer.
+- Keyboard shortcuts: `1` Food, `2` Money, `3` Sand, `E` Evidence
+  Constellation, `Q` Open Questions, `C` Conflict View, `S` Scenario Chamber,
+  `M` Memory Garden, `T` timeline, `H` guided handover, `N` Navigator, and
+  `Escape` to close the active layer.
 
 Deployment details and verification boundaries are recorded in
 [`DEPLOYMENT.md`](./DEPLOYMENT.md).

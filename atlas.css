@@ -229,8 +229,14 @@ summary:focus-visible,
 }
 
 .world-guide-label[data-kind="datum"],
-.world-guide-label[data-kind="canopy"] {
+.world-guide-label[data-kind="canopy"],
+.world-guide-label[data-kind="orbit"] {
   color: rgba(215, 213, 205, 0.52);
+}
+
+.world-guide-label[data-kind="orbit"] {
+  letter-spacing: 0.19em;
+  opacity: 0.72;
 }
 
 .world-guide-label[data-kind="memory"] {

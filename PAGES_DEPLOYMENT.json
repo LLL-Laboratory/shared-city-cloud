@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "artifactVersion": "0.4.0",
+  "artifactVersion": "0.5.0",
   "hostingProvider": "GITHUB PAGES ONLY",
   "deploymentStatus": "PUBLISHABLE STATIC ARTIFACT",
   "repository": "LLL-Laboratory/shared-city-cloud",
@@ -23,14 +23,17 @@
     "conditionStatus": "DRAFT / FOR TEAM REVIEW",
     "sharedMemoryEffect": "NONE",
     "lensStanding": "FOOD / MONEY / SAND EQUAL AND SEPARATE",
-    "lensAnswer": "UNKNOWN / NOT ESTIMABLE"
+    "lensAnswer": "UNKNOWN / NOT ESTIMABLE",
+    "orbitRole": "NAVIGATION / ATMOSPHERE ONLY",
+    "orbitResearchMeaning": "NONE"
   },
   "researchUtilities": {
     "evidenceConstellation": "9 TRACEABLE SOURCE NODES / LIMITATIONS VISIBLE",
     "openQuestions": "HOLD + UNKNOWN + PROPOSAL / NOT OUTCOMES",
     "conflictView": "4 UNRESOLVED PATHWAYS / NO SETTLED CAUSE",
     "scenarioChamber": "3 EQUAL READ-ONLY LENS PATHWAYS / NO RUN OR CROSS-LENS SYNTHESIS",
-    "memoryGarden": "8 BOUNDED HISTORY REPRESENTATIONS / NO EVIDENCE, TASK, OR MEMORY PROMOTION"
+    "memoryGarden": "8 BOUNDED HISTORY REPRESENTATIONS / NO EVIDENCE, TASK, OR MEMORY PROMOTION",
+    "orbitalModel": "3 EQUAL LENS BODIES / STILL DATUM / FIXED LOCAL SYSTEMS / NO RESEARCH MEANING"
   },
   "exclusions": [
     "NO EXTERNAL DATA COLLECTION",

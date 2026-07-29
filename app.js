@@ -101,7 +101,7 @@
     if (!state.selected) {
       state.camera.targetGoal = [0, 0.15, -0.35];
       orientationTitle.textContent = "SECTION 01 / LAGOS";
-      orientationHint.textContent = "ground records Â· active work Â· equal lens canopy";
+      orientationHint.textContent = "still shared datum · fixed local fields · equal lens orbit";
     }
     refreshRouteClasses();
     if (announceUpdate) {
@@ -198,7 +198,7 @@
     app.classList.remove("is-focused");
     state.camera.targetGoal = [0, 0.15, -0.35];
     orientationTitle.textContent = "SECTION 01 / LAGOS";
-    orientationHint.textContent = "ground records · active work · equal lens canopy";
+    orientationHint.textContent = "still shared datum · fixed local fields · equal lens orbit";
     refreshRouteClasses();
     const fallback = returnFocus?.closest?.("#navigator")
       ? document.querySelector("#navigatorButton")
@@ -604,14 +604,33 @@
       setMemoryTriggerState(true);
     }
     state.selected = node.id;
-    state.routeNodes = node.memoryGarden
-      ? new Set([node.id, ...(node.sourceNodeIds ?? [])])
-      : new Set();
+    const localNodeIds = data.orbitalModel?.localSystems?.[node.id] ?? [];
+    const isOrbitLens = data.orbitalModel?.orbitingNodeIds?.includes(node.id) ?? false;
+    if (isOrbitLens) {
+      const lensSystemFocus = new Set([
+        data.orbitalModel.centralDatumId,
+        ...data.orbitalModel.orbitingNodeIds,
+        ...localNodeIds
+      ]);
+      const lensSystemRoute = new Set([
+        data.orbitalModel.centralDatumId,
+        node.id,
+        ...localNodeIds
+      ]);
+      state.focusNodes = lensSystemFocus;
+      state.routeNodes = lensSystemRoute;
+    } else {
+      state.routeNodes = node.memoryGarden
+        ? new Set([node.id, ...(node.sourceNodeIds ?? [])])
+        : new Set();
+      state.focusNodes = new Set([node.id, "foundation"]);
+    }
     state.evidenceVisible = node.id === "condition" || Boolean(node.evidenceSource);
-    state.focusNodes = new Set([node.id, "foundation"]);
-    for (const edge of data.edges) {
-      if (edge.from === node.id) state.focusNodes.add(edge.to);
-      if (edge.to === node.id) state.focusNodes.add(edge.from);
+    if (!isOrbitLens) {
+      for (const edge of data.edges) {
+        if (edge.from === node.id) state.focusNodes.add(edge.to);
+        if (edge.to === node.id) state.focusNodes.add(edge.from);
+      }
     }
     app.classList.add("is-focused");
     detailLayer.hidden = false;
@@ -647,6 +666,13 @@
         ["Representation only", node.representationOnly ? "YES" : "NO"],
         ["Current task", node.currentTask ? "YES" : "NO"],
         ["Shared-memory promotion", node.sharedMemoryPromotion ? "YES" : "NO"]
+      );
+    }
+    if (isOrbitLens) {
+      factEntries.push(
+        ["Orbit role", data.orbitalModel.motionMeaning],
+        ["Position and proximity", "NO RESEARCH MEANING"],
+        ["Local system", `${localNodeIds.length} fixed objects / DOES NOT ORBIT LAGOS`]
       );
     }
     if (node.sourceId) factEntries.push(["Source register ID", node.sourceId]);
@@ -750,19 +776,24 @@
     }
     addDetailAction("Return to whole cloud", closeDetail);
 
+    const cameraAnchor = isOrbitLens ? averageNodePosition(localNodeIds) : node.position;
     state.camera.targetGoal = [
-      node.position[0] * 0.22,
-      node.position[1] * 0.22,
-      node.position[2] * 0.16
+      cameraAnchor[0] * 0.22,
+      cameraAnchor[1] * 0.22,
+      cameraAnchor[2] * 0.16
     ];
     orientationTitle.textContent = node.title;
-    orientationHint.textContent = `${node.label} · ${node.status}`;
+    orientationHint.textContent = isOrbitLens
+      ? `${node.label} · ${node.status} · ORBIT IS NAVIGATION ONLY`
+      : `${node.label} · ${node.status}`;
     announce(
       node.id === "condition"
         ? `${node.title} selected. ${node.label}. ${node.status}. ${data.evidenceConstellation.sourceNodeIds.length} traceable source nodes revealed with limitations.`
         : node.memoryGarden
           ? `${node.title} selected. ${node.label}. ${node.status}. Historical representation only; no current task or shared-memory promotion.`
-        : `${node.title} selected. ${node.label}. ${node.status}.`
+          : isOrbitLens
+            ? `${node.title} selected. ${node.label}. ${node.status}. Its fixed local system is highlighted; orbit and proximity carry no research meaning.`
+            : `${node.title} selected. ${node.label}. ${node.status}.`
     );
     refreshRouteClasses();
     detailTitle.focus({ preventScroll: true });
@@ -1067,6 +1098,12 @@
 
   document.querySelector("#resetView").addEventListener("click", resetView);
 
+  const lensShortcutIds = {
+    "1": "lens-food",
+    "2": "lens-money",
+    "3": "lens-sand"
+  };
+
   window.addEventListener("keydown", (event) => {
     if (scenarioChamberDialog.open) {
       if (event.key === "Escape") {
@@ -1095,6 +1132,10 @@
     if (event.key.toLowerCase() === "q") renderDetail("thoughts");
     if (event.key.toLowerCase() === "c") openConflictView();
     if (event.key.toLowerCase() === "s") openScenarioChamber();
+    if (lensShortcutIds[event.key]) {
+      event.preventDefault();
+      renderDetail(lensShortcutIds[event.key]);
+    }
     if (event.key.toLowerCase() === "m") {
       if (state.memoryGardenActive) closeMemoryGarden({ restoreFocus: true });
       else openMemoryGarden({ focusControl: true });
@@ -1114,6 +1155,12 @@
     button.dataset.hierarchy = String(node.hierarchy ?? 3);
     if (node.evidenceSource) button.dataset.evidence = "true";
     if (node.memoryGarden) button.dataset.memory = "true";
+    const lensShortcut = {
+      "lens-food": "1",
+      "lens-money": "2",
+      "lens-sand": "3"
+    }[node.id];
+    if (lensShortcut) button.setAttribute("aria-keyshortcuts", lensShortcut);
     button.tabIndex = -1;
     button.setAttribute("aria-label", `Select ${node.title}, ${node.label}`);
     button.append(makeElement("span", "", node.title), makeElement("small", "", node.label));
@@ -1652,6 +1699,20 @@
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(particles), gl.STATIC_DRAW);
 
   function nodeFloatPosition(node, time) {
+    if (node.orbit) {
+      if (reducedMotion) return [...node.position];
+      const elapsedTurns = time / (node.orbit.durationSeconds * 1000);
+      const angle =
+        ((data.orbitalModel.baseAngleDegrees + node.orbit.phaseDegrees) * Math.PI) / 180 +
+        elapsedTurns * Math.PI * 2;
+      const inclination = (node.orbit.inclinationDegrees * Math.PI) / 180;
+      const depthRadius = node.orbit.radius * (1 - node.orbit.eccentricity);
+      return [
+        node.orbit.center[0] + Math.cos(angle) * node.orbit.radius,
+        node.orbit.altitude + Math.sin(angle) * Math.sin(inclination) * node.orbit.radius,
+        node.orbit.center[2] + Math.sin(angle) * depthRadius
+      ];
+    }
     if (reducedMotion || node.stable) return [...node.position];
     const phase = [...node.id].reduce((sum, character) => sum + character.charCodeAt(0), 0) * 0.19;
     const amplitude = node.thought ? 0.035 : node.fragment ? 0.028 : 0.068;
@@ -1710,8 +1771,8 @@
       if (dashed && index % 3 === 1) continue;
       const point = (amount) => [
         center[0] + Math.cos(amount * Math.PI * 2) * radii[0],
-        center[1] + Math.sin(amount * Math.PI * 2) * radii[1],
-        center[2]
+        center[1],
+        center[2] + Math.sin(amount * Math.PI * 2) * radii[1]
       ];
       vertices.push(...point(index / segments), ...point((index + 1) / segments));
     }
@@ -1766,6 +1827,19 @@
         drawGuideVertices(
           viewProjection,
           [...guide.from, ...guide.to],
+          guide.color,
+          guide.alpha
+        );
+        continue;
+      }
+
+      if (guide.kind === "orbit") {
+        drawGuideVertices(
+          viewProjection,
+          ellipseVertices(
+            [guide.center[0], guide.altitude, guide.center[2]],
+            [guide.radius, guide.radius]
+          ),
           guide.color,
           guide.alpha
         );

@@ -1,6 +1,6 @@
 /* Generated from protected local research authority inputs. */
 window.SCC_DATA = {
-  "schemaVersion": "2.3.0",
+  "schemaVersion": "2.4.0",
   "sourceAuthority": "Protected local Shared Record Core, incident-register, and evidence-brief snapshots; authority files are not part of this public preview",
   "sourceRecords": {
     "incidentRegister": "SLC-0001 incident evidence register - INC-00 to INC-07 and INC-TIME-01",
@@ -62,6 +62,7 @@ window.SCC_DATA = {
       "stage": 1,
       "primary": false,
       "stable": true,
+      "alwaysVisible": true,
       "material": "datum",
       "region": "City Foundation",
       "hierarchy": 1,
@@ -561,9 +562,9 @@ window.SCC_DATA = {
       "effect": "NO CROSS-LENS TRANSFER",
       "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
       "position": [
-        -3.3,
+        -3.5507041555161982,
         3.25,
-        -0.35
+        -0.6500000000000008
       ],
       "size": 0.54,
       "scale": [
@@ -581,7 +582,22 @@ window.SCC_DATA = {
       "primary": true,
       "structuralPulse": true,
       "stable": true,
+      "orbitsLagos": true,
+      "orbit": {
+        "center": [
+          0,
+          0,
+          -2.7
+        ],
+        "radius": 4.1,
+        "altitude": 3.25,
+        "durationSeconds": 240,
+        "eccentricity": 0,
+        "inclinationDegrees": 0,
+        "phaseDegrees": 0
+      },
       "material": "lens",
+      "visualWeight": "EQUAL LARGE NAVIGATION BODY",
       "territory": "Food",
       "region": "Food Territory",
       "hierarchy": 2,
@@ -604,9 +620,9 @@ window.SCC_DATA = {
       "effect": "NO CROSS-LENS TRANSFER",
       "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
       "position": [
-        0,
+        -7.531577814756221e-16,
         3.25,
-        0.35
+        -6.8
       ],
       "size": 0.54,
       "scale": [
@@ -624,7 +640,22 @@ window.SCC_DATA = {
       "primary": true,
       "structuralPulse": true,
       "stable": true,
+      "orbitsLagos": true,
+      "orbit": {
+        "center": [
+          0,
+          0,
+          -2.7
+        ],
+        "radius": 4.1,
+        "altitude": 3.25,
+        "durationSeconds": 240,
+        "eccentricity": 0,
+        "inclinationDegrees": 0,
+        "phaseDegrees": 120
+      },
       "material": "lens",
+      "visualWeight": "EQUAL LARGE NAVIGATION BODY",
       "territory": "Money",
       "region": "Money Territory",
       "hierarchy": 2,
@@ -647,9 +678,9 @@ window.SCC_DATA = {
       "effect": "NO CROSS-LENS TRANSFER",
       "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
       "position": [
-        3.3,
+        3.5507041555161996,
         3.25,
-        -0.35
+        -0.6500000000000035
       ],
       "size": 0.54,
       "scale": [
@@ -667,7 +698,22 @@ window.SCC_DATA = {
       "primary": true,
       "structuralPulse": true,
       "stable": true,
+      "orbitsLagos": true,
+      "orbit": {
+        "center": [
+          0,
+          0,
+          -2.7
+        ],
+        "radius": 4.1,
+        "altitude": 3.25,
+        "durationSeconds": 240,
+        "eccentricity": 0,
+        "inclinationDegrees": 0,
+        "phaseDegrees": 240
+      },
       "material": "lens",
+      "visualWeight": "EQUAL LARGE NAVIGATION BODY",
       "territory": "Sand",
       "region": "Sand Territory",
       "hierarchy": 2,
@@ -709,6 +755,8 @@ window.SCC_DATA = {
       "stage": 3,
       "quietDuringPulse": true,
       "stable": true,
+      "fieldOwner": "lens-food",
+      "orbitsLagos": false,
       "material": "record",
       "territory": "Food",
       "region": "Food Territory",
@@ -734,7 +782,7 @@ window.SCC_DATA = {
       "position": [
         0,
         -1.22,
-        0.25
+        -5.4
       ],
       "size": 0.3,
       "scale": [
@@ -751,6 +799,8 @@ window.SCC_DATA = {
       "stage": 3,
       "quietDuringPulse": true,
       "stable": true,
+      "fieldOwner": "lens-money",
+      "orbitsLagos": false,
       "material": "record",
       "territory": "Money",
       "region": "Money Territory",
@@ -793,6 +843,8 @@ window.SCC_DATA = {
       "stage": 3,
       "quietDuringPulse": true,
       "stable": true,
+      "fieldOwner": "lens-sand",
+      "orbitsLagos": false,
       "material": "record",
       "territory": "Sand",
       "region": "Sand Territory",
@@ -836,6 +888,8 @@ window.SCC_DATA = {
       "quietDuringPulse": true,
       "primary": true,
       "stable": true,
+      "fieldOwner": "lens-food",
+      "orbitsLagos": false,
       "territory": "Food",
       "region": "Source / Detail Fragments",
       "hierarchy": 4,
@@ -859,9 +913,9 @@ window.SCC_DATA = {
       "effect": "NONE",
       "currentAnswer": "UNKNOWN / NOT ESTIMABLE",
       "position": [
-        0.5,
+        0.55,
         -2.02,
-        1.5
+        -4.35
       ],
       "size": 0.34,
       "scale": [
@@ -879,6 +933,8 @@ window.SCC_DATA = {
       "quietDuringPulse": true,
       "primary": true,
       "stable": true,
+      "fieldOwner": "lens-money",
+      "orbitsLagos": false,
       "territory": "Money",
       "region": "Source / Detail Fragments",
       "hierarchy": 4,
@@ -922,6 +978,8 @@ window.SCC_DATA = {
       "quietDuringPulse": true,
       "primary": true,
       "stable": true,
+      "fieldOwner": "lens-sand",
+      "orbitsLagos": false,
       "territory": "Sand",
       "region": "Source / Detail Fragments",
       "hierarchy": 4,
@@ -1382,10 +1440,13 @@ window.SCC_DATA = {
         "SLC-0001-FOOD-IMPACT-01"
       ],
       "territory": "Food",
+      "fieldOwner": "lens-food",
+      "orbitsLagos": false,
+      "stable": true,
       "position": [
-        4,
-        -0.62,
-        -0.55
+        -4.15,
+        -0.68,
+        0.8
       ],
       "kind": "OPEN QUESTION",
       "short": "No food journey, delivery, market, commodity, household-access, price, or loss outcome is currently linked to this condition with minimally sufficient evidence.",
@@ -1429,10 +1490,13 @@ window.SCC_DATA = {
         "SLC-0001-MONEY-IMPACT-01"
       ],
       "territory": "Money",
+      "fieldOwner": "lens-money",
+      "orbitsLagos": false,
+      "stable": true,
       "position": [
-        4.48,
-        -1,
-        -0.8700000000000001
+        -0.8,
+        -0.68,
+        -4.55
       ],
       "kind": "OPEN QUESTION",
       "short": "No fare, fuel, wage, receipt, sales, damage, emergency spending, borrowing, or other money-flow outcome is currently linked to this condition for a defined consenting case.",
@@ -1476,10 +1540,13 @@ window.SCC_DATA = {
         "SLC-0001-SAND-IMPACT-01"
       ],
       "territory": "Sand",
+      "fieldOwner": "lens-sand",
+      "orbitsLagos": false,
+      "stable": true,
       "position": [
-        4.96,
-        -0.62,
-        -1.19
+        4.15,
+        -0.68,
+        0.8
       ],
       "kind": "OPEN QUESTION",
       "short": "No complete field record currently establishes what EFAG observed or did at the bounded corridor and time, and no environmental cause or intervention effect can be estimated.",
@@ -1524,15 +1591,18 @@ window.SCC_DATA = {
         "SLC-0001-FOOD-TASK-01"
       ],
       "territory": "Food",
+      "fieldOwner": "lens-food",
+      "orbitsLagos": false,
+      "stable": true,
       "request": true,
       "sourceRefs": [
         "SLC-0001 evidence-development brief - collection status NOT STARTED",
         "Shared Record Core snapshot — SLC-0001-FOOD-01 / version 0001"
       ],
       "position": [
-        3.85,
+        -3.35,
         -1.42,
-        -0.55
+        -1.1
       ],
       "kind": "PROPOSED EVIDENCE REQUEST",
       "short": "If separately approved, test one pre-agreed eligible journey from one willing custodian and stop after that single record set.",
@@ -1574,15 +1644,18 @@ window.SCC_DATA = {
         "SLC-0001-MONEY-TASK-01"
       ],
       "territory": "Money",
+      "fieldOwner": "lens-money",
+      "orbitsLagos": false,
+      "stable": true,
       "request": true,
       "sourceRefs": [
         "SLC-0001 evidence-development brief - collection status NOT STARTED",
         "Shared Record Core snapshot — SLC-0001-MONEY-01 / version 0001"
       ],
       "position": [
-        4.47,
+        0.85,
         -1.42,
-        -1.01
+        -5.65
       ],
       "kind": "PROPOSED EVIDENCE REQUEST",
       "short": "If separately approved, preregister one case type, one primary money-flow field, and one comparison rule; request one consenting case and stop after one complete or declined request.",
@@ -1624,15 +1697,18 @@ window.SCC_DATA = {
         "SLC-0001-SAND-TASK-01"
       ],
       "territory": "Sand",
+      "fieldOwner": "lens-sand",
+      "orbitsLagos": false,
+      "stable": true,
       "request": true,
       "sourceRefs": [
         "SLC-0001 evidence-development brief - collection status NOT STARTED",
         "Shared Record Core snapshot — SLC-0001-SAND-01 / version 0001"
       ],
       "position": [
-        5.09,
+        3.35,
         -1.42,
-        -1.4700000000000002
+        -1.1
       ],
       "kind": "PROPOSED EVIDENCE REQUEST",
       "short": "If separately approved, send one bounded written request to the appropriate records custodian for one redacted incident or job record and directly associated field media, then stop after one response.",
@@ -2835,24 +2911,31 @@ window.SCC_DATA = {
     },
     {
       "id": "lens-canopy",
-      "kind": "canopy",
-      "title": "LENS CANOPY / EQUAL STANDING",
+      "kind": "orbit",
+      "title": "EQUAL LENS ORBIT / NAVIGATION + ATMOSPHERE ONLY",
       "labelPosition": [
-        -5.8,
-        3.3,
-        -0.35
+        -5.85,
+        3.35,
+        -0.65
       ],
       "nodeIds": [
         "lens-food",
         "lens-money",
         "lens-sand"
       ],
+      "center": [
+        0,
+        0,
+        -2.7
+      ],
+      "radius": 4.1,
+      "altitude": 3.25,
       "color": [
         0.67,
         0.66,
         0.61
       ],
-      "alpha": 0.2,
+      "alpha": 0.14,
       "showLabel": true
     },
     {
@@ -3590,6 +3673,51 @@ window.SCC_DATA = {
     "sharedMemoryPromotion": false,
     "caveat": "The Memory Garden is a bounded public navigation layer. It preserves draft, review, checkpoint, handover, and superseded-interface orientation without publishing source files or private text. Visibility, selection, placement, fading, and connection never turn an item into EVIDENCE, whole-record approval, a current task, or shared-memory promotion."
   },
+  "orbitalModel": {
+    "centralDatumId": "foundation",
+    "orbitingNodeIds": [
+      "lens-food",
+      "lens-money",
+      "lens-sand"
+    ],
+    "localSystems": {
+      "lens-food": [
+        "record-food",
+        "fragment-food",
+        "thought-food",
+        "request-food"
+      ],
+      "lens-money": [
+        "record-money",
+        "fragment-money",
+        "thought-money",
+        "request-money"
+      ],
+      "lens-sand": [
+        "record-sand",
+        "fragment-sand",
+        "thought-sand",
+        "request-sand"
+      ]
+    },
+    "baseAngleDegrees": 150,
+    "orbit": {
+      "center": [
+        0,
+        0,
+        -2.7
+      ],
+      "radius": 4.1,
+      "altitude": 3.25,
+      "durationSeconds": 240,
+      "eccentricity": 0,
+      "inclinationDegrees": 0
+    },
+    "simulation": false,
+    "causalMeaning": false,
+    "motionMeaning": "NAVIGATION / ATMOSPHERE ONLY",
+    "researchMeaningBoundary": "ORBIT, POSITION, PROXIMITY, AND LOCAL PLACEMENT CARRY NO RESEARCH MEANING"
+  },
   "interactionClaims": {
     "cityPulse": "INTERACTION DEMONSTRATION ONLY",
     "timeSlider": "KNOWN TIMESTAMPS SEPARATED FROM ILLUSTRATIVE POSITIONING",
@@ -3600,6 +3728,7 @@ window.SCC_DATA = {
     "conflictView": "OFFICIAL ACCOUNTS AND COMPETING PATHWAYS COMPARED WITHOUT SETTLING CAUSE",
     "scenarioChamber": "THREE EQUAL READ-ONLY LENS PATHWAYS; NO RUN, PREDICTION, CAUSAL RESULT, OR CROSS-LENS SYNTHESIS",
     "memoryGarden": "QUIET READ-ONLY HISTORY NAVIGATION; NO EVIDENCE, APPROVAL, TASK, OR SHARED-MEMORY PROMOTION",
+    "orbitalModel": "ORBIT, POSITION, PROXIMITY, AND LOCAL PLACEMENT CARRY NO RESEARCH MEANING",
     "guidedHandover": "READ-ONLY OPTIONAL ROUTE; NON-3D EQUIVALENT PROVIDED",
     "spatialGrammar": "GROUNDED RECORD FIELD; MIDDLE ACTIVE WORK; EQUAL LENS CANOPY; CENTRAL CITY DATUM",
     "materialSystem": "NEAR-BLACK ATLAS; NEUTRAL MATERIALS; MUTED MEANINGFUL ACCENTS",
